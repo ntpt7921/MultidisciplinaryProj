@@ -13,9 +13,6 @@ Hiện diện:
 
 ## Nội dung
 
-### Use-case của hệ thống và các tính năng cần thực hiện
-
-
 ### Các mục tiêu
 
 1. Draw the UML use-case diagram
