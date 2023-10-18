@@ -3,25 +3,25 @@
 
     if(!isset($_POST['username']))
     {
-        echo "Empty username";
+        echo json_encode(['status' => 'Failed']);
     }
     else if(!isset($_POST['password']))
     {
-        echo "Empty password";
+        echo json_encode(['status' => 'Failed']);
     }
     else
     {
         $usr_name = $_POST['username'];
         $password = $_POST['password'];
         $query = "select * from usr where usr_name='$usr_name' and usr_pass=password('$password')";
-        $connection->$query($query);
-        if(mysqli_affected_rows($connection) == 0)
+        $result =  mysqli_query($connection, $query);
+        if($result->num_rows == 0)
         {
-            echo 'Wrong password or username';
+            echo json_encode(['status' => 'Failed']);
         }
         else
         {
-            echo 'Login success';
+            echo json_encode(['status' => 'Success']);
         }
     }
     
