@@ -56,8 +56,12 @@ All the control triplet are:
 - RGB LED color
 - Pump
 
-There will be other topics serving each functionality, those will be mentioned with the
+There will be other topics serving other functionality, those will be mentioned with the
 functionality description.
+
+**Assumption:** for control triplet (unless noted otherwise), "0" string means negative,
+deactivated, disabled; "1" string means positive, activated, enabled. This is applied only to
+command and status topic. The result code return can have arbitrary string.
 
 # Specific for all use case
 
@@ -70,8 +74,11 @@ Read sensor (DHT20, soil humid). For each sensor, sent info through MQTT to brok
 ### MQTT topics
 
 - Air temp topic 
+    - `<prefix>/input/air_temp`
 - Air humidity topic 
+    - `<prefix>/input/air_humid`
 - Soil humidity topic
+    - `<prefix>/input/soil_humid`
 
 ## Plan watering
 
@@ -123,18 +130,25 @@ stateDiagram-v2
 ### MQTT topics
 
 - Pump control triplet
+    - `<prefix>/output/pump/state`
+    - `<prefix>/output/pump/result`
+    - `<prefix>/output/pump/command`
 - A notification topic
+    - `<prefix>/plant_watering/notification`
 
 ## Light control
 
 ### Description
 
-The light can be controlled remotely by the user. The user can see device state.
-- Color
+The light can be controlled by the user by changing the RGB triplet value. To turn off the light,
+set the triplet to (0, 0, 0). Any color and brightness is achievable through changing this triplet.
 
 For the light on/off control, activation can also be achieved through 
 - User control
 - PIR motion detection at night.
+
+The set RGB triplet will persist up until the automatically turn off. When it automatically turn on
+again, the color will be fixed (hard-coded), user have to change this again.
 
 ```mermaid
 stateDiagram-v2
@@ -182,7 +196,21 @@ stateDiagram-v2
 ### MQTT topics
 
 - light color control triplet 
+    - `<prefix>/output/rgb_led/state`
+    - `<prefix>/output/rgb_led/result`
+    - `<prefix>/output/rgb_led/command`
+
+    **Note**: The value sent to state and command will be a concatenation of the RGB triplet writen
+    in decimal value, zero-filled to 3 digit, in that specific order.
+
+    **Example**: For #FFFFFF, the corresponding string is "255255255"; for #000000, the string is
+    "000000000"; for #00FF00, the string is "000255000".
+
 - human presence result from AI topic
+    - `<prefix>/light_control/presence`
+
+- light control notification
+    - `<prefix>/light_control/notification`
 
 ## Fan control / Other device control
 
@@ -196,7 +224,17 @@ see device state.
 ### MQTT topics
 
 - For fan: control triplet
+    - `<prefix>/output/fan/state`
+    - `<prefix>/output/fan/result`
+    - `<prefix>/output/fan/command`
+
+    **Note**: The value sent to state and command will be a natural number in range [0-100],
+    formatted as a string.
+
 - For relay: control triplet
+    - `<prefix>/output/relay/state`
+    - `<prefix>/output/relay/result`
+    - `<prefix>/output/relay/command`
 
 ## Door control
 
@@ -263,6 +301,9 @@ stateDiagram-v2
 ### MQTT topics
 
 - door control triplet 
+    - `<prefix>/output/door/state`
+    - `<prefix>/output/door/result`
+    - `<prefix>/output/door/command`
 - camera face id 
-    - activation topic 
-    - result topic 
+    - activation topic `<prefix>/door_control/id_activate`
+    - result topic `<prefix>/door_control/id_result`
