@@ -1,0 +1,32 @@
+
+<form action="" method="post">
+    <button type="button" name="click_to_test">
+        submit
+    </button>
+    <br>
+    <label for="username">username:</label><br>
+     <input type="text"  name="username"><br>
+    <label for="password">password:</label><br>
+     <input type="password" name="password">
+</form>
+<h1>Status</h1>
+<h2 id="status"></h2>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<script>
+    document.getElementsByName('click_to_test')[0].addEventListener('click', function(){
+        $.ajax({
+            url : "http://localhost/services/authentication.php",
+            type: 'post',
+            data: {
+                username: document.getElementsByName('username')[0].value,
+                password: document.getElementsByName('password')[0].value
+            },
+            success: function(res){	
+                let response = JSON.parse(res);
+                document.getElementById('status').innerHTML = response['status'];
+            }
+        })
+    })
+</script>
