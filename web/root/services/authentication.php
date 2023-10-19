@@ -28,21 +28,19 @@
             $date->modify('+1 day');
             $date = $date->format('Y-m-d H:i:s');
             //create token
-            $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']); //header
-            $payload = json_encode(['user_id' => $data['usr_id']]); //payload
-            $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header)); // Encode Header to Base64Url String
-            $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload)); //Encode payload to _______
+            $userID = json_encode(['user_id' => $data['usr_id']]);
+            $base64UrlUserID= str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($userID));
             $time = json_encode(['time' => $date]);
             $base64UrlTime = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($time));
-            $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlTime, 'DADN_SMARTHOME', true); // Create Signature Hash
+            $signature = hash_hmac('sha256',$base64UrlUserID . "." . $base64UrlTime, 'DADN_SMARTHOME', true); // Create Signature Hash
             $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature)); //Encode signature
-            $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature; //Create JWT
+            $jwt =  $base64UrlUserID . ".". $base64UrlTime . "." . $base64UrlSignature; //Create JWT
             
             //add token to database
             $query = "INSERT INTO TOKENS VALUE ($usrID, '$jwt', '$date')";
             mysqli_query($connection, $query);
 
-            echo json_encode(['status' => 'Success', 'token' => $jwt]);
+            echo json_encode(['status' => 'Success', 'token' => $jwt, 'len' => strlen($jwt)]);
         }
     }
     

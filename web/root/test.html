@@ -27,9 +27,23 @@
             },
             success: function(res){	
                 res = JSON.parse(res);
-                if (res['status'] == 'Success') document.getElementById('status').innerHTML = res['token'];
+                document.cookie = 'token=' + res['token']+"; path=/";
+                window.location = 'test2.html';
             }
         })
     })
 
+    document.getElementsByName('get_data')[0].addEventListener('click', function(){
+        $.ajax({
+            url : "http://localhost/services/get_data.php",
+            type: 'post',
+            data: {
+                
+            },
+            success: function(res){	
+                res = JSON.parse(res);
+                document.getElementById('data').innerHTML = res['data'];
+            }
+        })
+    })
 </script>
