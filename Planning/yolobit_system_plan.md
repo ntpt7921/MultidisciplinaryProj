@@ -307,3 +307,5 @@ stateDiagram-v2
 - camera face id 
     - activation topic `<prefix>/door_control/id_activate`
     - result topic `<prefix>/door_control/id_result`
+- door control notification
+    - `<prefix>/door_control/notification`
