@@ -9,8 +9,10 @@
     <label for="password">password:</label><br>
      <input type="password" name="password">
 </form>
+<button type="button" name="get_data">Get data</button>
 <h1>Status</h1>
 <h2 id="status"></h2>
+<h3 id="data"></h3>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
@@ -24,9 +26,10 @@
                 password: document.getElementsByName('password')[0].value
             },
             success: function(res){	
-                let response = JSON.parse(res);
-                document.getElementById('status').innerHTML = response['status'];
+                res = JSON.parse(res);
+                if (res['status'] == 'Success') document.getElementById('status').innerHTML = res['token'];
             }
         })
     })
+
 </script>
