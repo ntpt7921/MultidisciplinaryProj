@@ -9,12 +9,10 @@
     <label for="password">password:</label><br>
      <input type="password" name="password">
 </form>
-<button type="button" name="get_data">Get data</button>
 <h1>Status</h1>
 <h2 id="status"></h2>
-<h3 id="data"></h3>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
 
 <script>
     document.getElementsByName('click_to_test')[0].addEventListener('click', function(){
@@ -27,23 +25,13 @@
             },
             success: function(res){	
                 res = JSON.parse(res);
-                document.cookie = 'token=' + res['token']+"; path=/";
-                window.location = 'test2.html';
-            }
+                {
+                    document.cookie = 'token=' + res['token']+";path=/;";
+                    window.location = 'test2.html';
+                }
+            },
         })
     })
 
-    document.getElementsByName('get_data')[0].addEventListener('click', function(){
-        $.ajax({
-            url : "http://localhost/services/get_data.php",
-            type: 'post',
-            data: {
-                
-            },
-            success: function(res){	
-                res = JSON.parse(res);
-                document.getElementById('data').innerHTML = res['data'];
-            }
-        })
-    })
+    
 </script>

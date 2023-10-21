@@ -1,5 +1,5 @@
 <?php
-    include('../config/db_config.php');
+    include('../config/config.php');
 
     if(!isset($_POST['username']))
     {
@@ -40,7 +40,7 @@
             $query = "INSERT INTO TOKENS VALUE ($usrID, '$jwt', '$date')";
             mysqli_query($connection, $query);
 
-            echo json_encode(['status' => 'Success', 'token' => $jwt, 'len' => strlen($jwt)]);
+            echo json_encode(['status' => 'Success', 'token' => $jwt, 'expired' => $date]);
         }
     }
     

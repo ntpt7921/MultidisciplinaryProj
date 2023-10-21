@@ -1,6 +1,29 @@
 <h1 id="cookie">
 
 </h1>
+<input id="table" type="text">
+<button type="button" name="get_data">Get</button>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
 <script>
-    document.getElementById('cookie').innerHTML = document.cookie;
+    document.getElementsByName('get_data')[0].addEventListener('click', function(){
+        $.ajax({
+            url : "http://localhost/services/get_data.php",
+            type: 'post',
+            data: {
+                table : document.getElementById('table').value,
+            },
+            success: function(res){	
+                res = JSON.parse(res);
+                res['data'].forEach(function (ele, index){
+                    for (var key in ele)
+                    {
+                        console.log("room: "+key);
+                        ele[key].forEach(function (elem, index){
+                            console.log("value: "+elem['value']+"; time: "+elem['time']+";");
+                        })
+                    }
+                })
+            }
+        })
+    })
 </script>
