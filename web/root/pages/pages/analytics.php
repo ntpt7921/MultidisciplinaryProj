@@ -12,6 +12,74 @@
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
+<?php
+  if(!isset($_COOKIE['token']))
+  {
+    header('Location: ../../. ');
+    exit();
+  }
+  else
+  {
+    include('../../config/config.php');
+    $token = $_COOKIE['token'];
+    $query = "SELECT usr_id, expire_date from tokens where val='$token'";
+    $result = mysqli_query($connection, $query);
+    if(mysqli_num_rows($result) == 0)
+    {
+      header('Location: ../../.');
+      $connection->close();
+      exit();
+    }
+    else
+    {
+      $data = mysqli_fetch_assoc($result);
+      $expire_date = $data['expire_date'];
+      $expire_date = strtotime($expire_date);
+      date_default_timezone_set('Asia/Bangkok');
+      $cur_date = new DateTime();
+      $cur_date = $cur_date->format('Y-m-d H:i:s');
+      if ($expire_date < strtotime($cur_date))
+      {
+        header('Location: ../../.');
+        $connection->close();
+        exit();
+      }
+      else
+      {
+        //Get user info
+        $usr_id = $data['usr_id'];
+        $query = "select first_name, last_name from usr where usr_id=$usr_id";
+        $result = mysqli_query($connection, $query);
+        $data = mysqli_fetch_assoc($result);
+        $first_name = $data['first_name'];
+        $last_name = $data['last_name'];
+        
+        //Get house info
+        $query = "select house_id from house where usr_id=$usr_id";
+        $result = mysqli_query($connection, $query);
+        $data = mysqli_fetch_assoc($result);
+        $house_id = $data['house_id'];
+        
+        //Get room info
+        $query = "select * from room where house_id=$house_id";
+        $result = mysqli_query($connection, $query);
+        $rooms_info = array();
+        while($data = mysqli_fetch_assoc($result))
+        {
+          $room_id = $data['room_id'];
+          $query = "SELECT value from cambien_nhietdo where room_id=$room_id ORDER BY time DESC LIMIT 1";
+          $result_1 = mysqli_query($connection, $query);
+          $data_1 = mysqli_fetch_assoc($result_1);
+          $data['value'] = $data_1['value'];
+          array_push($rooms_info, $data);
+        }
+        
+        $connection->close();
+      }
+    }
+  }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -108,7 +176,7 @@
   <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/soft-ui-dashboard/pages/dashboard.html " target="_blank">
+      <a class="navbar-brand m-0" href="">
         <img src="../assets/img/logo-ct-dark.png" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">LOGO</span>
       </a>
@@ -117,7 +185,7 @@
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="../pages/dashboard.html">
+          <a class="nav-link" href="">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>shop </title>
@@ -137,7 +205,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/tables.html">
+          <a class="nav-link " href="">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>office</title>
@@ -157,7 +225,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active " href="../pages/billing.html">
+          <a class="nav-link active " href="">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>credit-card</title>
@@ -177,7 +245,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  " href="../pages/virtual-reality.html">
+          <a class="nav-link  " href="">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>box-3d-50</title>
@@ -198,7 +266,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  " href="../pages/rtl.html">
+          <a class="nav-link  " href="">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>settings</title>
@@ -219,7 +287,7 @@
           </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link  " href="../pages/virtual-reality.html">
+            <a class="nav-link  " href="">
               <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                 <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                   <title>box-3d-50</title>
@@ -240,7 +308,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link  " href="../pages/virtual-reality.html">
+            <a class="nav-link" href="logout.php">
               <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                 <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                   <title>box-3d-50</title>
@@ -264,7 +332,7 @@
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link  " href="../pages/profile.html">
+          <a class="nav-link  " href="">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 46 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>customer-support</title>
@@ -284,25 +352,8 @@
             <span class="nav-link-text ms-1">Profile</span>
           </a>
         </li>
-
       </ul>
     </div>
-    <!-- <div class="sidenav-footer mx-3 ">
-      <div class="card card-background shadow-none card-background-mask-secondary" id="sidenavCard">
-        <div class="full-background" style="background-image: url('../assets/img/curved-images/white-curved.jpg')"></div>
-        <div class="card-body text-start p-3 w-100">
-          <div class="icon icon-shape icon-sm bg-white shadow text-center mb-3 d-flex align-items-center justify-content-center border-radius-md">
-            <i class="ni ni-diamond text-dark text-gradient text-lg top-0" aria-hidden="true" id="sidenavCardIcon"></i>
-          </div>
-          <div class="docs-info">
-            <h6 class="text-white up mb-0">Need help?</h6>
-            <p class="text-xs font-weight-bold">Please check our docs</p>
-            <a href="https://www.creative-tim.com/learning-lab/bootstrap/license/soft-ui-dashboard" target="_blank" class="btn btn-white btn-sm w-100 mb-0">Documentation</a>
-          </div>
-        </div>
-      </div>
-      <a class="btn bg-gradient-primary mt-3 w-100" href="https://www.creative-tim.com/product/soft-ui-dashboard-pro?ref=sidebarfree">Upgrade to pro</a>
-    </div> -->
   </aside>
   <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
     <!-- Navbar -->
@@ -324,7 +375,7 @@
           </div>
           <ul class="navbar-nav  justify-content-end">
             <li class="nav-item d-flex align-items-center">
-              <a class="btn btn-outline-primary btn-sm mb-0 me-3" target="_blank" href="https://www.creative-tim.com/builder?ref=navbar-soft-ui-dashboard">Online Builder</a>
+              <div class="btn btn-outline-primary btn-sm mb-0 me-3">Hello, <?php echo $first_name." ".$last_name ?></div>
             </li>
             <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
               <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
@@ -345,6 +396,7 @@
                 <i class="fa fa-bell cursor-pointer"></i>
               </a>
               <ul class="dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">
+
                 <li class="mb-2">
                   <a class="dropdown-item border-radius-md" href="javascript:;">
                     <div class="d-flex py-1">
@@ -363,54 +415,7 @@
                     </div>
                   </a>
                 </li>
-                <li class="mb-2">
-                  <a class="dropdown-item border-radius-md" href="javascript:;">
-                    <div class="d-flex py-1">
-                      <div class="my-auto">
-                        <img src="../assets/img/small-logos/logo-spotify.svg" class="avatar avatar-sm bg-gradient-dark  me-3 ">
-                      </div>
-                      <div class="d-flex flex-column justify-content-center">
-                        <h6 class="text-sm font-weight-normal mb-1">
-                          <span class="font-weight-bold">New album</span> by Travis Scott
-                        </h6>
-                        <p class="text-xs text-secondary mb-0 ">
-                          <i class="fa fa-clock me-1"></i>
-                          1 day
-                        </p>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item border-radius-md" href="javascript:;">
-                    <div class="d-flex py-1">
-                      <div class="avatar avatar-sm bg-gradient-secondary  me-3  my-auto">
-                        <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                          <title>credit-card</title>
-                          <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g transform="translate(-2169.000000, -745.000000)" fill="#FFFFFF" fill-rule="nonzero">
-                              <g transform="translate(1716.000000, 291.000000)">
-                                <g transform="translate(453.000000, 454.000000)">
-                                  <path class="color-background" d="M43,10.7482083 L43,3.58333333 C43,1.60354167 41.3964583,0 39.4166667,0 L3.58333333,0 C1.60354167,0 0,1.60354167 0,3.58333333 L0,10.7482083 L43,10.7482083 Z" opacity="0.593633743"></path>
-                                  <path class="color-background" d="M0,16.125 L0,32.25 C0,34.2297917 1.60354167,35.8333333 3.58333333,35.8333333 L39.4166667,35.8333333 C41.3964583,35.8333333 43,34.2297917 43,32.25 L43,16.125 L0,16.125 Z M19.7083333,26.875 L7.16666667,26.875 L7.16666667,23.2916667 L19.7083333,23.2916667 L19.7083333,26.875 Z M35.8333333,26.875 L28.6666667,26.875 L28.6666667,23.2916667 L35.8333333,23.2916667 L35.8333333,26.875 Z"></path>
-                                </g>
-                              </g>
-                            </g>
-                          </g>
-                        </svg>
-                      </div>
-                      <div class="d-flex flex-column justify-content-center">
-                        <h6 class="text-sm font-weight-normal mb-1">
-                          Payment successfully completed
-                        </h6>
-                        <p class="text-xs text-secondary mb-0 ">
-                          <i class="fa fa-clock me-1"></i>
-                          2 days
-                        </p>
-                      </div>
-                    </div>
-                  </a>
-                </li>
+      
               </ul>
             </li>
           </ul>
@@ -420,16 +425,19 @@
     <!-- End Navbar -->
     <div class="container-fluid py-4">
       <div class="row">
+        <?php 
+          foreach($rooms_info as $room_info)
+          {
+        ?>
           <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
               <div class="card-body p-3">
                 <div class="row">
                   <div class="col-8">
                     <div class="numbers">
-                      <p class="text-sm mb-0 text-capitalize font-weight-bold">Living room</p>
-                      <h5 class="font-weight-bolder mb-0">
-                        Để giá trị nhiệt độ hiện tại ở đây (hoặc độ ẩm)
-                        <?php //echo data; ?>
+                      <p class="text-sm mb-0 text-capitalize font-weight-bold"><?php echo $room_info['room_name'] ?></p>
+                      <h5 class="font-weight-bolder mb-0" id="room_<?php echo $room_info['room_id'] ?>">
+                        <?php echo $room_info['value']."&deg;C"; ?>
                       </h5>
                     </div>
                   </div>
@@ -443,88 +451,42 @@
               </div>
             </div>
           </div>
-          <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-              <div class="card-body p-3">
-                <div class="row">
-                  <div class="col-8">
-                    <div class="numbers">
-                      <p class="text-sm mb-0 text-capitalize font-weight-bold">Bedroom 1</p>
-                      <h5 class="font-weight-bolder mb-0">
-                        tương tự living room
-                      </h5>
-                    </div>
+        <?php   
+          }
+        ?>
+      </div>
+      <div class="row mt-4">
+          <div class="col">
+              <div class="card">
+                  <div class="card-body p-3">
+                      <div class="row">
+                          <div class="col-3 text-center">
+                              <h5 class="font-weight-bolder mb-0">Sensor</h5>
+                          </div>
+                          <div class="col-9">
+                            <select class="form-select" id="select_sensor">
+                              <option style="text-align:center">Temperature</option>
+                              <option style="text-align:center">Humidity</option>
+                              <option style="text-align:center">3</option>
+                              <option style="text-align:center">4</option>
+                            </select>
+                          </div>
+                      </div>
                   </div>
-                  <div class="col-4 text-end">
-                    <!-- icon nđ -->
-                    <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                      <i class="ni ni-world text-lg opacity-10" aria-hidden="true"></i>
-                    </div>
-                  </div>
-                </div>
               </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-              <div class="card-body p-3">
-                <div class="row">
-                  <div class="col-8">
-                    <div class="numbers">
-                      <p class="text-sm mb-0 text-capitalize font-weight-bold">Bedroom 2</p>
-                      <h5 class="font-weight-bolder mb-0">
-                        tương tự
-                      </h5>
-                    </div>
-                  </div>
-                  <div class="col-4 text-end">
-                    <!-- icon -->
-                    <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                      <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-sm-6">
-            <div class="card">
-              <div class="card-body p-3">
-                <div class="row">
-                  <div class="col-8">
-                    <div class="numbers">
-                      <p class="text-sm mb-0 text-capitalize font-weight-bold">Others</p>
-                      <h5 class="font-weight-bolder mb-0">
-                        tượng tự
-                      </h5>
-                    </div>
-                  </div>
-                  <div class="col-4 text-end">
-                    <!--icon-->
-                    <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                      <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
       </div>
       <div class="row mt-4">
         
           <div class="col">
-          Sẽ thay biểu đồ nhiệt hoặc cái gì khác ở đây
+          Sẽ thay biểu đồ nhiệt hoặc cái gì khác ở đây dựa theo mục đã chọn ở sensor, mặc định là temperature
             <div class="card">
               <div class="card-body p-3">
                 <div class="card z-index-2">
                   <div class="card-header pb-0">
                     <div class="row">
                       <div class="col">
-                        <h6>Rooms energy consumption</h6>
-                        <p class="text-sm">
-                          <i class="fa fa-arrow-down text-success"></i>
-                          <span class="font-weight-bold">2% less</span> than last month
-                        </p>
+                        <h6 id="Chart_name">Temperature Chart</h6>
                       </div>
                       <div class="col">
                         <ul style="text-decoration: none; list-style-type: none; display: flex; justify-content: flex-end; gap:20px;">
@@ -546,23 +508,7 @@
             </div>
           </div>
       </div>
-      <div class="row mt-4">
-          <div class="col">
-              <div class="card">
-                  <div class="card-body p-3">
-                      <div class="row">
-                          <div class="col-3">
-                              <h5 class="font-weight-bolder mb-0">Level</h5>
-                          </div>
-                          <div class="col-9">
-                              <input type="range" min="0" max="5" value="3" step="1" class="slider" id="fan-level-slider">
-                              <span id="slider-value">0</span>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
+
       <footer class="footer pt-3  ">
         <div class="container-fluid">
           <div class="row align-items-center justify-content-lg-between">
@@ -597,230 +543,16 @@
       </footer>
     </div>
   </main>
-  <div class="fixed-plugin">
-    <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
-      <i class="fa fa-cog py-2"> </i>
-    </a>
-    <div class="card shadow-lg ">
-      <div class="card-header pb-0 pt-3 ">
-        <div class="float-start">
-          <h5 class="mt-3 mb-0">Soft UI Configurator</h5>
-          <p>See our dashboard options.</p>
-        </div>
-        <div class="float-end mt-4">
-          <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
-            <i class="fa fa-close"></i>
-          </button>
-        </div>
-        <!-- End Toggle Button -->
-      </div>
-      <hr class="horizontal dark my-1">
-      <div class="card-body pt-sm-3 pt-0">
-        <!-- Sidebar Backgrounds -->
-        <div>
-          <h6 class="mb-0">Sidebar Colors</h6>
-        </div>
-        <a href="javascript:void(0)" class="switch-trigger background-color">
-          <div class="badge-colors my-2 text-start">
-            <span class="badge filter bg-gradient-primary active" data-color="primary" onclick="sidebarColor(this)"></span>
-            <span class="badge filter bg-gradient-dark" data-color="dark" onclick="sidebarColor(this)"></span>
-            <span class="badge filter bg-gradient-info" data-color="info" onclick="sidebarColor(this)"></span>
-            <span class="badge filter bg-gradient-success" data-color="success" onclick="sidebarColor(this)"></span>
-            <span class="badge filter bg-gradient-warning" data-color="warning" onclick="sidebarColor(this)"></span>
-            <span class="badge filter bg-gradient-danger" data-color="danger" onclick="sidebarColor(this)"></span>
-          </div>
-        </a>
-        <!-- Sidenav Type -->
-        <div class="mt-3">
-          <h6 class="mb-0">Sidenav Type</h6>
-          <p class="text-sm">Choose between 2 different sidenav types.</p>
-        </div>
-        <div class="d-flex">
-          <button class="btn bg-gradient-primary w-100 px-3 mb-2 active" data-class="bg-transparent" onclick="sidebarType(this)">Transparent</button>
-          <button class="btn bg-gradient-primary w-100 px-3 mb-2 ms-2" data-class="bg-white" onclick="sidebarType(this)">White</button>
-        </div>
-        <p class="text-sm d-xl-none d-block mt-2">You can change the sidenav type just on desktop view.</p>
-        <!-- Navbar Fixed -->
-        <div class="mt-3">
-          <h6 class="mb-0">Navbar Fixed</h6>
-        </div>
-        <div class="form-check form-switch ps-0">
-          <input class="form-check-input mt-1 ms-auto" type="checkbox" id="navbarFixed" onclick="navbarFixed(this)">
-        </div>
-        <hr class="horizontal dark my-sm-4">
-        <a class="btn bg-gradient-dark w-100" href="https://www.creative-tim.com/product/soft-ui-dashboard">Free Download</a>
-        <a class="btn btn-outline-dark w-100" href="https://www.creative-tim.com/learning-lab/bootstrap/license/soft-ui-dashboard">View documentation</a>
-        <div class="w-100 text-center">
-          <a class="github-button" href="https://github.com/creativetimofficial/soft-ui-dashboard" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star creativetimofficial/soft-ui-dashboard on GitHub">Star</a>
-          <h6 class="mt-3">Thank you for sharing!</h6>
-          <a href="https://twitter.com/intent/tweet?text=Check%20Soft%20UI%20Dashboard%20made%20by%20%40CreativeTim%20%23webdesign%20%23dashboard%20%23bootstrap5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fsoft-ui-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
-            <i class="fab fa-twitter me-1" aria-hidden="true"></i> Tweet
-          </a>
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/soft-ui-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
-            <i class="fab fa-facebook-square me-1" aria-hidden="true"></i> Share
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
+  
+  
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
-  <script>
-    // Level Slider
-    const slider = document.getElementById('fan-level-slider');
-    var output = document.getElementById('slider-value');
 
-    output.innerHTML = slider.value;
 
-    slider.oninput = function() {
-        output.innerHTML = this.value;
-    }
-    // End Level Slider
-
-    // Chart
-    var ctx0 = document.getElementById("chart-line-house-energy").getContext("2d");
-    
-    var gradientStroke0 = ctx0.createLinearGradient(0, 230, 0, 50);
-    gradientStroke0.addColorStop(1, 'rgba(203,12,159,0.2)');
-    gradientStroke0.addColorStop(0.2, 'rgba(72,72,176,0)');
-    gradientStroke0.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
-
-    var gradientStroke1 = ctx0.createLinearGradient(0, 230, 0, 50);
-    gradientStroke1.addColorStop(1, 'rgba(20,23,39,0.2)');
-    gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0)');
-    gradientStroke1.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
-
-    var gradientStroke2 = ctx0.createLinearGradient(0, 230, 0, 50);
-    gradientStroke2.addColorStop(1, 'rgba(240, 119, 110, 0.2)');
-    gradientStroke2.addColorStop(0.2, 'rgba(250, 175, 170, 0)');
-    gradientStroke2.addColorStop(0, 'rgba(250, 212, 210, 0)');
-
-    var gradientStroke2 = ctx0.createLinearGradient(0, 230, 0, 50);
-    gradientStroke2.addColorStop(1, 'rgba(240, 119, 110, 0.2)');
-    gradientStroke2.addColorStop(0.2, 'rgba(250, 175, 170, 0)');
-    gradientStroke2.addColorStop(0, 'rgba(250, 212, 210, 0)');
-
-    var gradientStroke3 = ctx0.createLinearGradient(0, 230, 0, 50);
-    gradientStroke3.addColorStop(1, 'rgba(130, 250, 176, 0.2)');
-    gradientStroke3.addColorStop(0.2, 'rgba(250, 175, 170, 0)');
-    gradientStroke3.addColorStop(0, 'rgba(250, 212, 210, 0)');
-
-    new Chart(ctx0, {
-      type: "line",
-      data: {
-        labels: ["Jan 2023", "Feb 2023", "Mar 2023", "Apr 2023", "May 2023", "June 2023", "July 2023", "Aug 2023", "Sep 2023", "Oct 2023"],
-        datasets: [{
-            label: "Living room",
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: "#cb0c9f",
-            borderWidth: 3,
-            backgroundColor: gradientStroke0,
-            fill: true,
-            data: [0, 0, 3, 4, 4, 2, 5, 5, 5, 5],
-            maxBarThickness: 6
-          },
-          {
-            label: "Bedroom 1",
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: "#3A416F",
-            borderWidth: 3,
-            backgroundColor: gradientStroke1,
-            fill: true,
-            data: [1, 2, 5, 4, 3, 2, 5, 4, 1, 3],
-            maxBarThickness: 6
-          },
-          {
-            label: "Bedroom 2",
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: "red",
-            borderWidth: 3,
-            backgroundColor: gradientStroke2,
-            fill: true,
-            data: [3, 1, 4, 4, 5, 3, 2, 1, 1, 2],
-            maxBarThickness: 6
-          },
-          {
-            label: "Others",
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: "green",
-            borderWidth: 3,
-            backgroundColor: gradientStroke3,
-            fill: true,
-            data: [2, 1, 6, 2, 1, 2, 3, 5, 1, 2],
-            maxBarThickness: 6
-          }
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#b2b9bf',
-              font: {
-                size: 11,
-                family: "Open Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#b2b9bf',
-              padding: 20,
-              font: {
-                size: 11,
-                family: "Open Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-    // End Chart
-  </script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -832,6 +564,8 @@
   </script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
+  <script src="../assets/js/analytics.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/soft-ui-dashboard.min.js?v=1.0.7"></script>
 </body>
