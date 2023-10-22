@@ -4,7 +4,7 @@ document.getElementById('select_sensor').addEventListener('change', function(){
     else if (this.value == "Temperature") table = 'cambien_nhietdo';
 
     $.ajax({
-        url : "http://localhost/services/get_latest_value.php",
+        url : "https://bk-hk231-dadn-smarthome.link/services/get_latest_value.php",
         type: 'post',
         data: {
             table : table,

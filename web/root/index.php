@@ -1,4 +1,6 @@
 <?php
+    include("./config/cors.php");
+
     if(isset($_COOKIE['token']))
     {
         include('./config/config.php');
@@ -21,9 +23,11 @@
         }
     
     }
+
 ?>
 
 <html>
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <form>
         Username: <input type="text" id="username" name="username"><br>
         Password: <input type="password" id="password" name="password"><br>
@@ -33,14 +37,16 @@
     <script>
         document.getElementById('login').addEventListener('click', function(){
             $.ajax({
-                url : "http://localhost/services/authentication.php",
+                url : "https://bk-hk231-dadn-smarthome.link/services/authentication.php",
                 type: 'post',
                 data: {
                     username: document.getElementById('username').value,
                     password: document.getElementById('password').value
                 },
                 success: function(res){	
+                    console.log(res);
                     res = JSON.parse(res);
+                    if(res['status'] == 'Success')
                     {
                         document.cookie = 'token=' + res['token']+";path=/;";
                         window.location = './pages/pages/analytics.php';
