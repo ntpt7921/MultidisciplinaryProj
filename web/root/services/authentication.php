@@ -1,5 +1,5 @@
 <?php
-    include('../config/db_config.php');
+
 
     if(!isset($_POST['username']))
     {
@@ -11,6 +11,7 @@
     }
     else
     {
+        include('../config/config.php');
         $usr_name = $_POST['username'];
         $password = $_POST['password'];
         $query = "select usr_id from usr where usr_name='$usr_name' and usr_pass=password('$password')";
@@ -37,12 +38,14 @@
             $jwt =  $base64UrlUserID . ".". $base64UrlTime . "." . $base64UrlSignature; //Create JWT
             
             //add token to database
-            $query = "INSERT INTO TOKENS VALUE ($usrID, '$jwt', '$date')";
+            $query = "INSERT INTO tokens VALUE ($usrID, '$jwt', '$date')";
             mysqli_query($connection, $query);
+           
+            echo json_encode(['status' => 'Success', 'token' => $jwt, 'expired' => $date]);
 
-            echo json_encode(['status' => 'Success', 'token' => $jwt, 'len' => strlen($jwt)]);
         }
+         $connection->close();
     }
+
     
-    $connection->close();
 ?>
