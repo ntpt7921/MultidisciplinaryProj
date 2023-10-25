@@ -1,4 +1,5 @@
 <?php
+    include("../config/cors.php");
     if(!isset($_COOKIE['token']) || !isset($_POST['table']))
     {
         echo json_encode(['status' => 'Failed']);

@@ -1,5 +1,5 @@
 <?php
-
+    include("../config/cors.php");
 
     if(!isset($_POST['username']))
     {
@@ -11,6 +11,12 @@
     }
     else
     {
+        $expr = '/[a-zA-z0-9]/';
+        if(!preg_match($expr, $_POST['username']) || !preg_match($expr, $_POST['password']))
+        {
+            echo json_encode(['status' => 'Failed']);
+            exit();
+        }
         include('../config/config.php');
         $usr_name = $_POST['username'];
         $password = $_POST['password'];
