@@ -1,7 +1,6 @@
 <?php
     if(!isset($_COOKIE['token']))
     {
-        header('Location: ../');
         exit();
     }
     include('../config/config.php');
@@ -9,5 +8,4 @@
     $query = "delete from tokens where val = $token";
     mysqli_query($connection, $query);
     $connection->close();
-    header('Location: ../');
 ?>

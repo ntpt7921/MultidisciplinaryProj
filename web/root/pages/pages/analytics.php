@@ -468,8 +468,6 @@
                             <select class="form-select" id="select_sensor">
                               <option style="text-align:center">Temperature</option>
                               <option style="text-align:center">Humidity</option>
-                              <option style="text-align:center">3</option>
-                              <option style="text-align:center">4</option>
                             </select>
                           </div>
                       </div>
