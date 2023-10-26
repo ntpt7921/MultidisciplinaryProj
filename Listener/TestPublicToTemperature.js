@@ -14,4 +14,4 @@ client.on('connect', function () {
 	 var temperature = readline.question();
 	client.publish('input/air_temp', temperature);
 	client.end();
-  })
+})
