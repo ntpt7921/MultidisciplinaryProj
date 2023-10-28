@@ -381,7 +381,7 @@
                   <canvas id="temp-chart" class="chart-canvas" height="170"></canvas>
                 </div>
               </div>
-              <h6 class="ms-2 mt-4 mb-0">Temperature</h6>
+              <h6 class="ms-2 mt-4 mb-0">Last 10 record of temperature</h6>
             </div>
           </div>
         </div>
@@ -396,7 +396,7 @@
                   <canvas id="humid-chart" class="chart-canvas" height="170"></canvas>
                 </div>
               </div>
-              <h6 class="ms-2 mt-4 mb-0">Humidity </h6>
+              <h6 class="ms-2 mt-4 mb-0">Last 10 record of humidity </h6>
             </div>
           </div>
         </div>
@@ -491,6 +491,7 @@
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="../assets/js/home.js"></script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;

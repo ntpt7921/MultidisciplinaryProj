@@ -1,7 +1,7 @@
 <?php
 
     include("../../config/cors.php");
-    if(!isset($_COOKIE['token']) || !isset($_POST['table']))
+    if(!isset($_COOKIE['token']) || !isset($_POST['type']) || !isset($_POST['room_id']) || !isset($_POST['number']))
     {
         echo json_encode(['status' => 'Failed']);
     }
@@ -28,35 +28,29 @@
             }
             else
             {
-                $query = "select house_id from house where usr_id=".$usr_id;
+                //get house id
+                $query = "select house_id from house where usr_id=$usr_id";
                 $result = mysqli_query($connection, $query);
                 $data = mysqli_fetch_assoc($result);
                 $house_id = $data['house_id'];
 
-                $query = "select room_id from room where house_id=".$house_id;
+                //get data here
+                $num_row = $_POST['number'];
+                $table = $_POST['type'] == "humidity" ? "cambien_doam" : "cambien_nhietdo";
+                $room_id = $_POST['room_id'];
+                $query = "select value, time from $table where house_id=$house_id and room_id=$room_id ORDER BY time DESC LIMIT $num_row";
                 $result = mysqli_query($connection, $query);
-                $room_ids = array();
-                while ($data = mysqli_fetch_assoc($result))
+                $label = array();
+                $data = array();
+                while($row = mysqli_fetch_assoc($result))
                 {
-                    array_push($room_ids, $data['room_id']);
+                    array_push($label, $row["time"]);
+                    array_push($data, $row["value"]);
                 }
-                
-                $table = $_POST['table'];
-                $return_data = array();
-                foreach($room_ids as $room_id)
-                {
-                    $current_room_data = array();
-                    $query = "select value, time from $table where house_id=$house_id and room_id=$room_id";
-                    $result = mysqli_query($connection, $query);
-                    while($data = mysqli_fetch_assoc($result))
-                    {
-                        array_push($current_room_data, $data);
-                    }
-                    array_push($return_data, [$room_id => $current_room_data]);
-                }
-                echo json_encode(['status' => 'Success', 'data' => $return_data]);
+
+                echo json_encode(['status' => 'success', 'label' => $label,'data'=> $data]);
             }
-            $connection->close();
         }
+        $connection->close();
     }
 ?>
