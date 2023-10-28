@@ -66,21 +66,29 @@
         $data = mysqli_fetch_assoc($result);
         $house_id = $data['house_id'];
         
-        //Get room info
-        $query = "select * from room where house_id=$house_id";
-        $result = mysqli_query($connection, $query);
-        $rooms_devices_info = array();
-        while($data = mysqli_fetch_assoc($result))
-        {
-          $room_id = $data['room_id'];
-          $query = "SELECT value from cambien_nhietdo where room_id=$room_id ORDER BY time DESC LIMIT 1";
-          $result_1 = mysqli_query($connection, $query);
-          $data_1 = mysqli_fetch_assoc($result_1);
-          $data['value'] = $data_1['value'];
-          array_push($rooms_devices_info, $data);
-        }
-        $connection->close();
+        //get living room info
+          $query = "select room_id, room_name from room where house_id=$house_id";
+          $result = mysqli_query($connection, $query);
+          $rooms_info = array();
+          while($row = mysqli_fetch_assoc($result))
+          {
+              $current_room = array();
+              $current_room['room_id'] = $row['room_id'];
+              $current_room['room_name'] = $row['room_name'];
+              $current_room_id = $current_room['room_id'];
+              $query = "SELECT device_id, device_name, status FROM devices where house_id=$house_id and room_id=$current_room_id";
+              $res = mysqli_query($connection, $query);
+              $current_room_devices_info = array();
+              while($r = mysqli_fetch_assoc($res))
+              {
+                array_push($current_room_devices_info, $r);
+              }
+              $current_room['devices'] = $current_room_devices_info;
+              array_push($rooms_info, $current_room);
+          }
+        
     }
+    $connection->close();
   }
 ?>
 
@@ -355,8 +363,8 @@
                   <p class="mb-1 pt-2 text-bold">Welcome back, <?php echo $first_name." ".$last_name ?></p>
                   <h5 class="font-weight-bolder">Saturday, 21 Oct, 2023</h5>
                   <h1>12:00 AM</h1>
-                  <h6>Current Temperature: 12 °C </h2>
-                  <h6>Current Humidity: 88 g/m<sup>3</sup>
+                  <h6>Current Temperature: <span id="temper"> -- </span>°C</h2>
+                  <h6>Current Humidity: <span id="humid"> -- </span>g/m<sup>3</sup>
                 </div>
               </div>
             </div>
@@ -394,10 +402,15 @@
         </div>
       </div>
       <div class="row mt-4 ">
+      <h5 class="ms-2 mt-0 mb-2">Quick Access </h5>
+        <?php
+            foreach($rooms_info as $room_info)
+            {
+        ?>
         <div class="col-sm-4 mb-lg-0 mb-4">
           <div class="card z-index-2">
             <div class="card-body p-3">
-              <h6 class="ms-2 mt-0 mb-2">Quick Access </h6>
+              <h6 class="ms-2 mt-0 mb-2"><?php echo $room_info['room_name']; ?></h6>
               <div class="table-responsive">
                 <table class="table align-items-center mb-0">
                   <thead>
@@ -407,91 +420,32 @@
                     </tr>
                   </thead>
                   <tbody>
+                  <?php foreach($room_info['devices'] as $device) { ?>
                     <tr>
                       <td>
                         <div class="d-flex py-0">
                           <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Device 1</h6>
+                            <h6 class="mb-0 text-sm"><?php echo $device['device_name'] ?></h6>
                           </div>
                         </div>
                       </td>
                       <td>
                         <div class="form-check form-switch ps-0">
-                          <input class="form-check-input mt-1 ms-auto" type="checkbox" onclick="">
+                          <input class="form-check-input mt-1 ms-auto" name="switch_status" value="<?php echo $house_id.$room_info['room_id'].$device['device_id']; ?>" type="checkbox" 
+                          <?php echo ($device['status']==1 ? "checked" :  ""); ?>>
                         </div>
                       </td>
                     </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex py-0">
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Device 1</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="form-check form-switch ps-0">
-                          <input class="form-check-input mt-1 ms-auto" type="checkbox" onclick="">
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex py-0">
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Device 3</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="form-check form-switch ps-0">
-                          <input class="form-check-input mt-1 ms-auto" type="checkbox" onclick="">
-                        </div>
-                      </td>
-                    </tr>
+                    <?php } ?>
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-sm-5 mb-lg-0 mb-4">
-          <div class="card h-100 card-background card-background-mask-primary move-on-hover align-items-start">
-            <div class="cursor-pointer">
-              <div class="full-background" style="background-image: url('../assets/img/curved-images/curved1.jpg')"></div>
-              <div class="card-body mt-3 z-index-2">
-                <table class="table align-items-center mb-0">
-                  <tbody>
-                    <tr>
-                      <td>
-                        <h5 class="text-white mb-0">Some Kind Of Blues</h5>
-                        <p class="text-white text-sm">Deftones</p>
-                        <div class="d-flex mt-5">
-                          <button class="btn btn-outline-white rounded-circle p-2 mb-0" type="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Prev">
-                            <i class="fas fa-backward p-2"></i>
-                          </button> 
-                          <button class="btn btn-outline-white rounded-circle p-2 mx-2 mb-0" type="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Pause">
-                            <i class="fas fa-play p-2"></i>
-                          </button>
-                          <button class="btn btn-outline-white rounded-circle p-2 mb-0" type="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Next">
-                            <i class="fas fa-forward p-2"></i>
-                          </button>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="bg-gradient-primary border-radius-lg h-100">
-                          <div class="position-relative d-flex align-items-center justify-content-center h-100">
-                            <img class="w-100 position-relative z-index-2" src="https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ec/2b/11/ec2b11ab-afda-01e3-0331-1c1b61bf8dc2/COCC-17680.jpg/600x600bf-60.jpg">
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
+        <?php
+            }
+        ?>
       </div>
       <footer class="footer pt-3  ">
         <div class="container-fluid">
