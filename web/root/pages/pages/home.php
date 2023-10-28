@@ -33,27 +33,32 @@
     }
     else
     {
-      $data = mysqli_fetch_assoc($result);
-      $expire_date = $data['expire_date'];
-      $expire_date = strtotime($expire_date);
-      date_default_timezone_set('Asia/Bangkok');
-      $cur_date = new DateTime();
-      $cur_date = $cur_date->format('Y-m-d H:i:s');
-      if ($expire_date < strtotime($cur_date))
-      {
-        header('Location: ../../.');
-        $connection->close();
-        exit();
-      }
-      else
-      {
-        //Get user info
+        $data = mysqli_fetch_assoc($result);
+        $expire_date = $data['expire_date'];
+        $expire_date = strtotime($expire_date);
+        date_default_timezone_set('Asia/Bangkok');
+        $cur_date = new DateTime();
+        $cur_date = $cur_date->format('Y-m-d H:i:s');
+        if ($expire_date < strtotime($cur_date))
+        {
+            header('Location: ../.');
+            $connection->close();
+            exit();
+        }
+
+         //Get user info
         $usr_id = $data['usr_id'];
         $query = "select first_name, last_name from usr where usr_id=$usr_id";
         $result = mysqli_query($connection, $query);
         $data = mysqli_fetch_assoc($result);
         $first_name = $data['first_name'];
         $last_name = $data['last_name'];
+
+        //Get house info
+        $query = "select house_id from house where usr_id=$usr_id";
+        $result = mysqli_query($connection, $query);
+        $data = mysqli_fetch_assoc($result);
+        $house_id = $data['house_id'];
         
         //Get house info
         $query = "select house_id from house where usr_id=$usr_id";
@@ -64,7 +69,7 @@
         //Get room info
         $query = "select * from room where house_id=$house_id";
         $result = mysqli_query($connection, $query);
-        $rooms_info = array();
+        $rooms_devices_info = array();
         while($data = mysqli_fetch_assoc($result))
         {
           $room_id = $data['room_id'];
@@ -72,11 +77,9 @@
           $result_1 = mysqli_query($connection, $query);
           $data_1 = mysqli_fetch_assoc($result_1);
           $data['value'] = $data_1['value'];
-          array_push($rooms_info, $data);
+          array_push($rooms_devices_info, $data);
         }
-        
         $connection->close();
-      }
     }
   }
 ?>
@@ -90,7 +93,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <title>
-    Analytics
+    Home
   </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -107,74 +110,75 @@
   <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
 
   <style>
-    .slider{
-        -webkit-appearance: none;
-        width: 70%;
-        height: 10px;
-        background: #d3d3d3;
-        outline: none;
-        opacity: 0.7;
-        -webkit-transition: .2s;
-        transition: opacity .2s;
-        border-radius: 50px;
+    .slider {
+      -webkit-appearance: none;
+      width: 70%;
+      height: 10px;
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+      border-radius: 50px;
     }
+
     .slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #cb0c9f;
-        cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #cb0c9f;
+      cursor: pointer;
     }
 
     .slider::-webkit-slider-thumb:hover {
-        background: #f72093;
+      background: #f72093;
     }
 
     .slider::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #cb0c9f;
-        cursor: pointer;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #cb0c9f;
+      cursor: pointer;
     }
 
     .slider::-moz-range-thumb:hover {
-        background: #f72093;
+      background: #f72093;
     }
 
     #slider-value {
-        display: inline-block;
-        position: relative;
-        width: 30px;
-        height: 30px;
-        color: white;
-        line-height: 25px;
-        text-align: center;
-        border-radius: 3px;
-        background: #cb0c9f;
-        background-image: linear-gradient(135deg, #f72093, #8225c5);
-        margin-left: 20px;
-        top: -2px;
+      display: inline-block;
+      position: relative;
+      width: 30px;
+      height: 30px;
+      color: white;
+      line-height: 25px;
+      text-align: center;
+      border-radius: 3px;
+      background: #cb0c9f;
+      background-image: linear-gradient(135deg, #f72093, #8225c5);
+      margin-left: 20px;
+      top: -2px;
 
-        &:after {
-            position: absolute;
-            top: 8px;
-            left: -5px;
-            width: 0;
-            height: 0;
-            border-top: 7px solid transparent;
-            border-right: 7px solid #cb0c9f;
-            border-bottom: 7px solid transparent;
-            content: '';
-        }
+      &:after {
+        position: absolute;
+        top: 8px;
+        left: -5px;
+        width: 0;
+        height: 0;
+        border-top: 7px solid transparent;
+        border-right: 7px solid #cb0c9f;
+        border-bottom: 7px solid transparent;
+        content: '';
+      }
     }
   </style>
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
-  <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand m-0" href="">
@@ -186,7 +190,7 @@
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="./home.php">
+          <a class="nav-link active" href="./home.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>shop </title>
@@ -226,7 +230,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active " href="./analytics.php">
+          <a class="nav-link" href="./analytics.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>credit-card</title>
@@ -300,35 +304,15 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
             <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Pages</a></li>
-            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Analytics</li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Homepage</li>
           </ol>
-          <h6 class="font-weight-bolder mb-0">Analytics</h6>
+          <h6 class="font-weight-bolder mb-0">Homepage</h6>
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-            <div class="input-group">
-              <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-              <input type="text" class="form-control" placeholder="Type here...">
-            </div>
+
           </div>
           <ul class="navbar-nav  justify-content-end">
-            <li class="nav-item d-flex align-items-center">
-              <div class="btn btn-outline-primary btn-sm mb-0 me-3">Hello, <?php echo $first_name." ".$last_name ?></div>
-            </li>
-            <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
-                <div class="sidenav-toggler-inner">
-                  <i class="sidenav-toggler-line"></i>
-                  <i class="sidenav-toggler-line"></i>
-                  <i class="sidenav-toggler-line"></i>
-                </div>
-              </a>
-            </li>
-            <li class="nav-item px-3 d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-body p-0">
-                <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
-              </a>
-            </li>
             <li class="nav-item dropdown pe-2 d-flex align-items-center">
               <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa fa-bell cursor-pointer"></i>
@@ -362,100 +346,165 @@
     </nav>
     <!-- End Navbar -->
     <div class="container-fluid py-4">
-      <div class="row">
-        <?php 
-          foreach($rooms_info as $room_info)
-          {
-        ?>
-          <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-              <div class="card-body p-3">
-                <div class="row">
-                  <div class="col-8">
-                    <div class="numbers">
-                      <p class="text-sm mb-0 text-capitalize font-weight-bold"><?php echo $room_info['room_name'] ?></p>
-                      <h5 class="font-weight-bolder mb-0" id="room_<?php echo $room_info['room_id'] ?>">
-                        <?php echo $room_info['value']."&deg;C"; ?>
-                      </h5>
-                    </div>
-                  </div>
-                  <div class="col-4 text-end">
-                    <!---Thay = icon nhiệt độ -->
-                    <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                      <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
-                    </div>
-                  </div>
+      <div class="row mt-4">
+        <div class="col-lg-4 mb-lg-0 mb-3" >
+          <div class="card" style="height: 100%;"> <!--edit here-->
+            <div class="card-body p-3">
+              <div class="row">
+                <div class="d-flex flex-column h-100">
+                  <p class="mb-1 pt-2 text-bold">Welcome back, <?php echo $first_name." ".$last_name ?></p>
+                  <h5 class="font-weight-bolder">Saturday, 21 Oct, 2023</h5>
+                  <h1>12:00 AM</h1>
+                  <h6>Current Temperature: 12 °C </h2>
+                  <h6>Current Humidity: 88 g/m<sup>3</sup>
                 </div>
               </div>
             </div>
           </div>
-        <?php   
-          }
-        ?>
-      </div>
-      <div class="row mt-4">
-          <div class="col">
-              <div class="card">
-                  <div class="card-body p-3">
-                      <div class="row">
-                          <div class="col-3 text-center">
-                              <h5 class="font-weight-bolder mb-0">Sensor</h5>
-                          </div>
-                          <div class="col-9">
-                            <select class="form-select" id="select_sensor">
-                              <option style="text-align:center">Temperature</option>
-                              <option style="text-align:center">Humidity</option>
-                            </select>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-      <div class="row mt-4">
-        
-          <div class="col">
-          Sẽ thay biểu đồ nhiệt hoặc cái gì khác ở đây dựa theo mục đã chọn ở sensor, mặc định là temperature
-            <div class="card">
-              <div class="card-body p-3">
-                <div class="card z-index-2">
-                  <div class="card-header pb-0">
-                    <div class="row">
-                      <div class="col">
-                        <h6 id="Chart_name">Temperature Chart</h6>
-                      </div>
-                      <div class="col">
-                        <ul style="text-decoration: none; list-style-type: none; display: flex; justify-content: flex-end; gap:20px;">
-                          <li><a href="#">Day</a></li>
-                          <li><a href="#">Week</a></li>
-                          <li><a href="#">Month</a></li>
-                          <li><a href="#">Year</a></li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="chart">
-                        <canvas id="chart-line-house-energy" class="chart-canvas" height="500"></canvas>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-      </div>
+        </div>
 
+        <!--temp-->
+
+        <div class="col-lg-4 mb-lg-0 mb-4">
+          <div class="card z-index-2">
+            <div class="card-body p-3">
+              <div class="bg-gradient-dark border-radius-lg py-3 pe-1 mb-3">
+                <div class="chart">
+                  <canvas id="temp-chart" class="chart-canvas" height="170"></canvas>
+                </div>
+              </div>
+              <h6 class="ms-2 mt-4 mb-0">Temperature</h6>
+            </div>
+          </div>
+        </div>
+
+        <!--Humid-->
+
+        <div class="col-lg-4 mb-lg-0 mb-4">
+          <div class="card z-index-2">
+            <div class="card-body p-3">
+              <div class="bg-gradient-dark border-radius-lg py-3 pe-1 mb-3">
+                <div class="chart">
+                  <canvas id="humid-chart" class="chart-canvas" height="170"></canvas>
+                </div>
+              </div>
+              <h6 class="ms-2 mt-4 mb-0">Humidity </h6>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4 ">
+        <div class="col-sm-4 mb-lg-0 mb-4">
+          <div class="card z-index-2">
+            <div class="card-body p-3">
+              <h6 class="ms-2 mt-0 mb-2">Quick Access </h6>
+              <div class="table-responsive">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Device</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Off/On</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div class="d-flex py-0">
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm">Device 1</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-check form-switch ps-0">
+                          <input class="form-check-input mt-1 ms-auto" type="checkbox" onclick="">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="d-flex py-0">
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm">Device 1</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-check form-switch ps-0">
+                          <input class="form-check-input mt-1 ms-auto" type="checkbox" onclick="">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="d-flex py-0">
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm">Device 3</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-check form-switch ps-0">
+                          <input class="form-check-input mt-1 ms-auto" type="checkbox" onclick="">
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-5 mb-lg-0 mb-4">
+          <div class="card h-100 card-background card-background-mask-primary move-on-hover align-items-start">
+            <div class="cursor-pointer">
+              <div class="full-background" style="background-image: url('../assets/img/curved-images/curved1.jpg')"></div>
+              <div class="card-body mt-3 z-index-2">
+                <table class="table align-items-center mb-0">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <h5 class="text-white mb-0">Some Kind Of Blues</h5>
+                        <p class="text-white text-sm">Deftones</p>
+                        <div class="d-flex mt-5">
+                          <button class="btn btn-outline-white rounded-circle p-2 mb-0" type="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Prev">
+                            <i class="fas fa-backward p-2"></i>
+                          </button> 
+                          <button class="btn btn-outline-white rounded-circle p-2 mx-2 mb-0" type="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Pause">
+                            <i class="fas fa-play p-2"></i>
+                          </button>
+                          <button class="btn btn-outline-white rounded-circle p-2 mb-0" type="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Next">
+                            <i class="fas fa-forward p-2"></i>
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="bg-gradient-primary border-radius-lg h-100">
+                          <div class="position-relative d-flex align-items-center justify-content-center h-100">
+                            <img class="w-100 position-relative z-index-2" src="https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ec/2b/11/ec2b11ab-afda-01e3-0331-1c1b61bf8dc2/COCC-17680.jpg/600x600bf-60.jpg">
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <footer class="footer pt-3  ">
         <div class="container-fluid">
           <div class="row align-items-center justify-content-lg-between">
             <div class="col-lg-6 mb-lg-0 mb-4">
               <div class="copyright text-center text-sm text-muted text-lg-start">
-                © <script>
+                ©
+                <script>
                   document.write(new Date().getFullYear())
                 </script>,
                 made with <i class="fa fa-heart"></i> by
                 <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>
-                and edit by HCMUTers.
+                for a better web.
               </div>
             </div>
             <div class="col-lg-6">
@@ -464,13 +513,15 @@
                   <a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative Tim</a>
                 </li>
                 <li class="nav-item">
-                  <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About Us</a>
+                  <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About
+                    Us</a>
                 </li>
                 <li class="nav-item">
                   <a href="https://www.creative-tim.com/blog" class="nav-link text-muted" target="_blank">Blog</a>
                 </li>
                 <li class="nav-item">
-                  <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted" target="_blank">License</a>
+                  <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted"
+                    target="_blank">License</a>
                 </li>
               </ul>
             </div>
@@ -479,16 +530,14 @@
       </footer>
     </div>
   </main>
-  
-  
+
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
-
-
+  <script src="../assets/js/home.js"></script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -500,8 +549,6 @@
   </script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
-  <script src="../assets/js/analytics.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/soft-ui-dashboard.min.js?v=1.0.7"></script>
 </body>

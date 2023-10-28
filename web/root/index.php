@@ -13,11 +13,11 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
 <?php
-      include("./config/cors.php");
+      include("../config/cors.php");
 
       if(isset($_COOKIE['token']))
       {
-          include('./config/config.php');
+          include('../config/config.php');
           $token = $_COOKIE['token'];
           $query = "SELECT usr_id, expire_date from tokens where val='$token'";
           $result = mysqli_query($connection, $query);

@@ -6,7 +6,7 @@
     }
     else
     {
-        include('../../config/config.php');
+        include('../../../config/config.php');
         $token = $_COOKIE['token'];
         $query = "delete from tokens where val='$token'";
         $result = mysqli_query($connection, $query);

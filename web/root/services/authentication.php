@@ -1,5 +1,5 @@
 <?php
-    include("../config/cors.php");
+    include("../../config/cors.php");
 
     if(!isset($_POST['username']))
     {
@@ -11,13 +11,14 @@
     }
     else
     {
-        $expr = '/[a-zA-z0-9]/';
+        try{
+            $expr = '/[a-zA-z0-9]/';
         if(!preg_match($expr, $_POST['username']) || !preg_match($expr, $_POST['password']))
         {
             echo json_encode(['status' => 'Failed']);
             exit();
         }
-        include('../config/config.php');
+        include('../../config/config.php');
         $usr_name = $_POST['username'];
         $password = $_POST['password'];
         $query = "select usr_id from usr where usr_name='$usr_name' and usr_pass=password('$password')";
@@ -51,6 +52,11 @@
 
         }
          $connection->close();
+        }catch(Exception $e)
+        {
+            echo json_encode(['status' => $e->getMessage()]);
+        }
+        
     }
 
     

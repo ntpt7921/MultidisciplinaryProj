@@ -1,13 +1,13 @@
 <?php
 
-    include("../config/cors.php");
+    include("../../config/cors.php");
     if(!isset($_COOKIE['token']) || !isset($_POST['table']))
     {
         echo json_encode(['status' => 'Failed']);
     }
     else
     {
-        include('../config/config.php');
+        include('../../config/config.php');
         $token = $_COOKIE['token'];
         $query = "select usr_id, expire_date from tokens where val='$token'";
         $result = mysqli_query($connection, $query);
