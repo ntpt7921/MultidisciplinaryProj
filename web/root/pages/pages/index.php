@@ -90,6 +90,12 @@
     }
     $connection->close();
   }
+
+  date_default_timezone_set('Asia/Bangkok');
+  $current_date = new DateTime($datetime);
+  $date_part = $current_date->format('Y-m-d');
+  $time_part = $current_date->format('H:i');
+  $weekdate = date('l');
 ?>
 
 <!DOCTYPE html>
@@ -361,8 +367,8 @@
               <div class="row">
                 <div class="d-flex flex-column h-100">
                   <p class="mb-1 pt-2 text-bold">Welcome back, <?php echo $first_name." ".$last_name ?></p>
-                  <h5 class="font-weight-bolder">Saturday, 21 Oct, 2023</h5>
-                  <h1>12:00 AM</h1>
+                  <h5 class="font-weight-bolder"><?php echo $weekdate.", ".$date_part; ?></h5>
+                  <h1><?php echo $time_part; ?></h1>
                   <h6>Current Temperature: <span id="temper"> -- </span>°C</h2>
                   <h6>Current Humidity: <span id="humid"> -- </span>g/m<sup>3</sup>
                 </div>
