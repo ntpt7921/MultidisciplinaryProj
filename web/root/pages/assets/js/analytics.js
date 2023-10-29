@@ -176,6 +176,14 @@ document.getElementById('select_sensor').addEventListener('change', function(){
      },
    });
    // End Chart
+   var icons = document.getElementsByName('icon');
+
+   if(this.value == "Temperature") clss = "bi bi-thermometer text-lg opacity-10";
+   else clss = "<bi bi-moisture text-lg opacity-10";
+   icons.forEach((icon, ind) => {
+      icon.className = clss;
+   })
+   
 })
 
 function getData(type, room_id, d)
