@@ -42,6 +42,17 @@ Functionality:
     - presence detection result
     - face id result
 
+## MQTT message format
+
+We assume that there is multiple implementation of the system, each with different `room_id` and
+`house_id`. All instance of the system will send/receive by the same centralized topic. So to
+differentiate each instance, every packet of information sent/received by the system must have the
+following format: `<house_id>;<room_id>;<content>`.
+
+Each Yolo:bit instance is expected to be able to parse the packet, determining if the packet is
+directed toward itself or not. If `house_id` and `room_id` match, then process the content; if not
+then discard the packet.
+
 ## Control signal sent through MQTT topics
 
 Since we are not sure about the QoS provided by the Yolo:bit, and also because we need some type of
@@ -64,6 +75,23 @@ deactivated, disabled; "1" string means positive, activated, enabled. This is ap
 command and status topic. The result code return can have arbitrary string.
 
 # Specific for all use case
+
+## Current state reporting
+
+### Description
+
+We need a way for the system to report its current state (input/output states). Not really a user
+facing use case, since only other component communicating with the Yolo:bit need this.
+
+We define a topic, into which the Yolo:bit will listen. If any message is publish into this topic,
+the system will responds with it states.
+
+### MQTT topics
+
+- Input state:
+    - `<prefix>/report_current state/input`
+- Output state (we only send door, light, pump, relay, fan)
+    - `<prefix>/report_current state/output`
 
 ## Environment monitoring
 
