@@ -362,10 +362,12 @@
     </nav>
     <!-- End Navbar -->
     <div class="container-fluid py-4">
-      <div class="row">
+      
         <?php 
+          $i = 0;
           foreach($rooms_info as $room_info)
           {
+          if ($i % 4 == 0) echo '<div class="row">';
         ?>
           <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
@@ -374,7 +376,7 @@
                   <div class="col-8">
                     <div class="numbers">
                       <p class="text-sm mb-0 text-capitalize font-weight-bold"><?php echo $room_info['room_name'] ?></p>
-                      <h5 class="font-weight-bolder mb-0" id="room_<?php echo $room_info['room_id'] ?>">
+                      <h5 class="font-weight-bolder mb-0" value="<?php echo $room_info['room_name']; ?>" id="room_<?php echo $room_info['room_id'] ?>">
                         <?php echo $room_info['value']."&deg;C"; ?>
                       </h5>
                     </div>
@@ -389,10 +391,11 @@
               </div>
             </div>
           </div>
-        <?php   
+        <?php
+          if ($i % 4 == 3) echo "</div>";   
+          $i += 1;
           }
         ?>
-      </div>
       <div class="row mt-4">
           <div class="col">
               <div class="card">
@@ -435,7 +438,7 @@
                     </div>
                     <div class="row">
                       <div class="chart">
-                        <canvas id="chart-line-house-energy" class="chart-canvas" height="500"></canvas>
+                        <canvas id="chart" class="chart-canvas" height="500"></canvas>
                       </div>
                     </div>
                   </div>

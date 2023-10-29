@@ -11,6 +11,7 @@ $.ajax({
       data = Object.values(res['data']).reverse();
       label = Object.values(res['label'].reverse());
       document.getElementById('temper').innerHTML = data[0]+" ";
+      
       var temp = document.getElementById("temp-chart").getContext("2d");
       //Temerature chart
       new Chart(temp, {
@@ -161,6 +162,23 @@ $.ajax({
       });
   }
 })
+
+function updateClock() {
+  var now = new Date(), // current date
+  hour =  now.getHours();
+  minute = now.getMinutes();
+  if (minute < 10) minute = "0"+minute;
+  second = now.getSeconds();
+  if (second < 10) second = "0"+second;
+  time = hour + ':' + minute + ":" + second;// again, you get the idea
+
+  // set the content of the element with the ID time to the formatted string
+  document.getElementById('time').innerHTML = time;
+
+  // call this function again in 1000ms
+  setTimeout(updateClock, 1000);
+}
+updateClock(); // initial call
 
 
  

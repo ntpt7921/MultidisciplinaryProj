@@ -368,7 +368,7 @@
                 <div class="d-flex flex-column h-100">
                   <p class="mb-1 pt-2 text-bold">Welcome back, <?php echo $first_name." ".$last_name ?></p>
                   <h5 class="font-weight-bolder"><?php echo $weekdate.", ".$date_part; ?></h5>
-                  <h1><?php echo $time_part; ?></h1>
+                  <h1 id="time"><?php echo $time_part; ?></h1>
                   <h6>Current Temperature: <span id="temper"> -- </span>°C</h2>
                   <h6>Current Humidity: <span id="humid"> -- </span>g/m<sup>3</sup>
                 </div>
@@ -407,11 +407,12 @@
           </div>
         </div>
       </div>
-      <div class="row mt-4 ">
       <h5 class="ms-2 mt-0 mb-2">Quick Access </h5>
         <?php
+        $i = 0;
             foreach($rooms_info as $room_info)
             {
+        if ($i % 3 == 0) echo '<div class="row mt-4 ">';
         ?>
         <div class="col-sm-4 mb-lg-0 mb-4">
           <div class="card z-index-2">
@@ -450,6 +451,8 @@
           </div>
         </div>
         <?php
+         if ($i % 3 == 2) echo '</div>';
+         $i += 1;
             }
         ?>
       </div>
