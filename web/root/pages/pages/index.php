@@ -59,13 +59,7 @@
         $result = mysqli_query($connection, $query);
         $data = mysqli_fetch_assoc($result);
         $house_id = $data['house_id'];
-        
-        //Get house info
-        $query = "select house_id from house where usr_id=$usr_id";
-        $result = mysqli_query($connection, $query);
-        $data = mysqli_fetch_assoc($result);
-        $house_id = $data['house_id'];
-        
+
         //get living room info
           $query = "select room_id, room_name from room where house_id=$house_id";
           $result = mysqli_query($connection, $query);
@@ -204,7 +198,7 @@
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" href="./home.php">
+          <a class="nav-link active" href="./">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>shop </title>
@@ -224,7 +218,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="">
+          <a class="nav-link " href="./room.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>office</title>
@@ -420,7 +414,7 @@
       </div>
       <h5 class="ms-2 mt-0 mb-2">Quick Access </h5>
         <?php
-        $i = 0;
+          $i = 0;
             foreach($rooms_info as $room_info)
             {
         if ($i % 3 == 0) echo '<div class="row mt-4 ">';
@@ -478,7 +472,7 @@
                 </script>,
                 made with <i class="fa fa-heart"></i> by
                 <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>
-                for a better web.
+                and edit by HCMUTers.
               </div>
             </div>
             <div class="col-lg-6">

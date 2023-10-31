@@ -12,6 +12,7 @@
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
+
 <?php
   include("../../../config/cors.php");
   if(!isset($_COOKIE['token']))
@@ -71,13 +72,21 @@
           $query = "SELECT value from cambien_nhietdo where room_id=$room_id and house_id=$house_id ORDER BY time DESC LIMIT 1";
           $result_1 = mysqli_query($connection, $query);
           $data_1 = mysqli_fetch_assoc($result_1);
-          $data['value'] = $data_1['value'];
+          $data['temperature'] = $data_1['value'];
+          $query = "SELECT value from cambien_doam where room_id=$room_id and house_id=$house_id ORDER BY time DESC LIMIT 1";
+          $result_1 = mysqli_query($connection, $query);
+          $data_1 = mysqli_fetch_assoc($result_1);
+          $data['humidity'] = $data_1['value'];
           array_push($rooms_info, $data);
         }
         
         $connection->close();
       }
     }
+  }
+  function C_to_F($C)
+  {
+    return $C * 1.8 +32;
   }
 ?>
 
@@ -90,7 +99,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <title>
-    Analytics
+    Home
   </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -99,10 +108,6 @@
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
-    <!-- Bootstrap Font Icon CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="../assets/css/soft-ui-dashboard-2.css?v=1.0.7" rel="stylesheet" />
@@ -110,76 +115,76 @@
   <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
   <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
 
-
   <style>
-    .slider{
-        -webkit-appearance: none;
-        width: 70%;
-        height: 10px;
-        background: #d3d3d3;
-        outline: none;
-        opacity: 0.7;
-        -webkit-transition: .2s;
-        transition: opacity .2s;
-        border-radius: 50px;
+    .slider {
+      -webkit-appearance: none;
+      width: 70%;
+      height: 10px;
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+      border-radius: 50px;
     }
+
     .slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #cb0c9f;
-        cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #cb0c9f;
+      cursor: pointer;
     }
 
     .slider::-webkit-slider-thumb:hover {
-        background: #f72093;
+      background: #f72093;
     }
 
     .slider::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #cb0c9f;
-        cursor: pointer;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #cb0c9f;
+      cursor: pointer;
     }
 
     .slider::-moz-range-thumb:hover {
-        background: #f72093;
+      background: #f72093;
     }
 
     #slider-value {
-        display: inline-block;
-        position: relative;
-        width: 30px;
-        height: 30px;
-        color: white;
-        line-height: 25px;
-        text-align: center;
-        border-radius: 3px;
-        background: #cb0c9f;
-        background-image: linear-gradient(135deg, #f72093, #8225c5);
-        margin-left: 20px;
-        top: -2px;
+      display: inline-block;
+      position: relative;
+      width: 30px;
+      height: 30px;
+      color: white;
+      line-height: 25px;
+      text-align: center;
+      border-radius: 3px;
+      background: #cb0c9f;
+      background-image: linear-gradient(135deg, #f72093, #8225c5);
+      margin-left: 20px;
+      top: -2px;
 
-        &:after {
-            position: absolute;
-            top: 8px;
-            left: -5px;
-            width: 0;
-            height: 0;
-            border-top: 7px solid transparent;
-            border-right: 7px solid #cb0c9f;
-            border-bottom: 7px solid transparent;
-            content: '';
-        }
+      &:after {
+        position: absolute;
+        top: 8px;
+        left: -5px;
+        width: 0;
+        height: 0;
+        border-top: 7px solid transparent;
+        border-right: 7px solid #cb0c9f;
+        border-bottom: 7px solid transparent;
+        content: '';
+      }
     }
   </style>
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
-  <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand m-0" href="">
@@ -211,7 +216,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="./room.php">
+          <a class="nav-link active" href="./room.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>office</title>
@@ -231,7 +236,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active " href="./analytics.php">
+          <a class="nav-link" href="./analytics.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>credit-card</title>
@@ -305,16 +310,13 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
             <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Pages</a></li>
-            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Analytics</li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Room</li>
           </ol>
-          <h6 class="font-weight-bolder mb-0">Analytics</h6>
+          <h6 class="font-weight-bolder mb-0">Room list</h6>
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
-          
-
-
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-              
+
           </div>
           
           <ul class="navbar-nav  justify-content-end">
@@ -361,89 +363,87 @@
     </nav>
     <!-- End Navbar -->
     <div class="container-fluid py-4">
-      
-        <?php 
-          $i = 0;
-          foreach($rooms_info as $room_info)
-          {
-          if ($i % 4 == 0) echo '<div class="row">';
-        ?>
-          <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-              <div class="card-body p-3">
-                <div class="row">
-                  <div class="col-8">
-                    <div class="numbers">
-                      <p class="text-sm mb-0 text-capitalize font-weight-bold"><?php echo $room_info['room_name'] ?></p>
-                      <h5 class="font-weight-bolder mb-0" value="<?php echo $room_info['room_name']; ?>" id="room_<?php echo $room_info['room_id'] ?>">
-                        <?php echo $room_info['value']."&deg;C"; ?>
-                      </h5>
-                    </div>
-                  </div>
-                  <div class="col-4 text-end">
-                    <!---Thay = icon nhiệt độ -->
-                    <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                      <i name="icon" class="bi bi-thermometer text-lg opacity-10" aria-hidden="true"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="card mb-4">
+            <div class="card-header pb-0">
+              <h6>Rooms</h6>
             </div>
-          </div>
-        <?php
-          if ($i % 4 == 3) echo "</div>";   
-          $i += 1;
-          }
-        ?>
-      <div class="row mt-4">
-          <div class="col">
-              <div class="card">
-                  <div class="card-body p-3">
-                      <div class="row">
-                          <div class="col-3 text-center">
-                              <h5 class="font-weight-bolder mb-0">Sensor</h5>
-                          </div>
-                          <div class="col-9">
-                            <select class="form-select" id="select_sensor">
-                              <option style="text-align:center">Temperature</option>
-                              <option style="text-align:center">Humidity</option>
-                            </select>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-      <div class="row mt-4">
-        
-          <div class="col">
-            <div class="card">
-              <div class="card-body p-3">
-                <div class="card z-index-2">
-                  <div class="card-header pb-0">
-                    <div class="row">
-                      <div class="col">
-                        <h6 id="Chart_name">Temperature Chart</h6>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="chart">
-                        <canvas id="chart" class="chart-canvas" height="500"></canvas>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-      </div>
+            <div class="card-body px-0 pt-0 pb-2">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Temperature</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Moisture</th>
+                      <!--
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Light</th>
+                      -->
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Last check</th>
+                      <th class="text-secondary opacity-7"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
 
+                    <?php
+                      foreach($rooms_info as $room_info)
+                      {
+                    ?>
+                    <tr>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm"><?php echo $room_info['room_name']; ?></h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        <p class="text-xs font-weight-bold mb-0"><?php echo $room_info['room_id']; ?></p>
+                      </td>
+                      <td class="text-center">
+                        <p class="text-xs font-weight-bold mb-0"><?php echo $room_info['temperature']; ?> °C</p>
+                        <p class="text-xs text-secondary mb-0"><?php echo C_to_F($room_info['temperature']); ?>°F</p>
+                      </td>
+                      <td class="text-center">
+                        <p class="text-xs font-weight-bold mb-0"><?php echo $room_info['humidity']; ?>g/m<sup>3</sup></p>
+                      </td>
+                      <!---
+                      <td class="align-middle text-center text-sm">
+                        <span class="badge badge-sm bg-gradient-success">On</span>
+                      </td>
+                      -->
+                      <td class="align-middle text-center">
+                        <span class="text-secondary text-xs font-weight-bold">
+                            <?php echo ($room_info['last_check']=="" ? "Have't checked" : $room_info['last_check']); ?>
+                        </span>
+                      </td>
+                      <td class="align-middle">
+                        <a href="./room_detail.php?id=<?php echo $room_info['room_id']; ?>" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                          View
+                        </a>
+                      </td>
+                    </tr>
+                    
+                    <?php
+                      }
+                    ?>
+                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <footer class="footer pt-3  ">
         <div class="container-fluid">
           <div class="row align-items-center justify-content-lg-between">
             <div class="col-lg-6 mb-lg-0 mb-4">
               <div class="copyright text-center text-sm text-muted text-lg-start">
-                © <script>
+                ©
+                <script>
                   document.write(new Date().getFullYear())
                 </script>,
                 made with <i class="fa fa-heart"></i> by
@@ -457,13 +457,15 @@
                   <a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative Tim</a>
                 </li>
                 <li class="nav-item">
-                  <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About Us</a>
+                  <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About
+                    Us</a>
                 </li>
                 <li class="nav-item">
                   <a href="https://www.creative-tim.com/blog" class="nav-link text-muted" target="_blank">Blog</a>
                 </li>
                 <li class="nav-item">
-                  <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted" target="_blank">License</a>
+                  <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted"
+                    target="_blank">License</a>
                 </li>
               </ul>
             </div>
@@ -472,16 +474,12 @@
       </footer>
     </div>
   </main>
-  
-  
+
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
-  <script src="../assets/js/plugins/chartjs.min.js"></script>
-
-
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -493,8 +491,6 @@
   </script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
-  <script src="../assets/js/analytics.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/soft-ui-dashboard.min.js?v=1.0.7"></script>
 </body>
