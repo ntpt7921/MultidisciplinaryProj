@@ -111,7 +111,7 @@
   <!-- Nepcha Analytics (nepcha.com) -->
   <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
   <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
   <style>
     .slider {
       -webkit-appearance: none;
@@ -362,8 +362,13 @@
     <div class="container-fluid py-4">
         <input type="hidden" value="<?php echo $current_room ?>" id="room_id" ?>
         <div class='row mt-4'> 
-            <div class="col-7">
-                
+            <div class="col-7 text-center" style="margin: 0px auto">
+               <div class="row" style="width: 100%; height: 90%;">
+                  <img id="image" name="<?php echo $current_room ?>" style="margin: 5px; height:90%;">
+               </div>
+               <div class="row">
+                  <button id="get_room_image" type="button" class="btn btn-primary" style="width:80%; margin:5px auto;">Get room image</button>
+              </div>
             </div>
             <div class="col-5">
                 <div class="row">
@@ -399,18 +404,53 @@
         </div>
         <div class="row">
             <h5 class="ms-2 mt-0 mb-2">Devices</h5>
-            <?php 
-                $count = 0;
-                foreach($room_info['devices'] as $device)
-                {
-                    if ($count % 2 == 0) echo '<div class="row mt-4 ">';
-            ?>
-                
-            <?php
-                    if ($count % 3 == 2) echo '</div>';
-                    $count++;
-                }
-            ?>
+            <div class="card-body px-0 pt-0 pb-2">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                      <!--
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Light</th>
+                      -->
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <?php
+                      foreach($room_info['devices'] as $device)
+                      {
+                    ?>
+                    <tr>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm"><?php echo $device['device_name']; ?></h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        <p class="text-xs font-weight-bold mb-0"><?php echo $device['device_id']; ?></p>
+                      </td>
+
+                      <td class="align-middle d-flex justify-content-center">
+                        <div class="form-check form-switch ps-0">
+                          <input class="form-check-input mt-1 ms-auto" name="switch_status" value="<?php echo $house_id.$room_info['room_id'].$device['device_id']; ?>" type="checkbox" 
+                          <?php echo ($device['status']==1 ? "checked" :  ""); ?>>
+                        </div>
+                      </td>
+                    </tr>
+                    
+                    <?php
+                      }
+                    ?>
+                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
         </div>
 
 
@@ -459,6 +499,7 @@
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.1.4/mqtt.min.js" integrity="sha512-knHZpp2I1nNk/lyHovKKB5NBU+NGPlqlFcqAvseuTTEohJDGyYtPm/RoV5HYJwWaNhfzyYW7ndgj2pyeedV0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="../assets/js/room_detail.js"></script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;

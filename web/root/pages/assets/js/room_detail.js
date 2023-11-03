@@ -160,3 +160,21 @@ $.ajax({
         });
     }
   })
+
+  document.getElementById('get_room_image').addEventListener('click', function(){
+    var img = document.getElementById('image');
+    $.ajax({
+      url : "https://bk-hk231-dadn-smarthome.link/services/get_room_image.php",
+      type: 'post',
+      data: {
+          room_id : img.name,
+      },
+      success: function(res){	
+          res = JSON.parse(res);
+          if (res['status'] == 'success')
+          {
+            img.src = res['image'];
+          }
+      }
+    })
+  })
