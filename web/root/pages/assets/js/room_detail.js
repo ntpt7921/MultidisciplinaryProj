@@ -161,11 +161,14 @@ $.ajax({
     }
   })
 
-  document.getElementById('get_room_image').addEventListener('click', function(){
+
+  function update_image()
+  {
     var img = document.getElementById('image');
     $.ajax({
       url : "https://bk-hk231-dadn-smarthome.link/services/get_room_image.php",
       type: 'post',
+      async: true,
       data: {
           room_id : img.name,
       },
@@ -177,4 +180,43 @@ $.ajax({
           }
       }
     })
-  })
+  }
+
+  update_image();
+  setInterval(update_image, 1000);
+
+  devices = document.getElementsByName('switch_status');
+  devices.forEach(device => {
+    device.addEventListener('click', function(){
+      ids = device.value.split('');
+      house_id = ids[0];
+      room_id = ids[1];
+      device_id = ids[2];
+      if(device.checked) request = 'turn on';
+      else request = 'turn off';
+      $.ajax({
+        url : "https://bk-hk231-dadn-smarthome.link/services/send_request_to_device.php",
+        type: 'post',
+        data: {
+            room_id : room_id,
+            house_id: house_id,
+            device_id : device_id,
+            request : request
+        },
+        success: function(res){	
+            res = JSON.parse(res);
+            if (res['status'] == 'success')
+            {
+              console.log(res);
+            }
+            else
+            {
+              if (request == 'turn on') device.checked = false;
+              else device.checked = true;
+              console.log(device.checked);
+              console.log(request);
+            }
+        }
+      })
+    })
+  });

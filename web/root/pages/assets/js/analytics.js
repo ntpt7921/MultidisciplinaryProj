@@ -210,3 +210,9 @@ function getData(type, room_id, d)
 
 let element = document.getElementById('select_sensor');
 element.dispatchEvent(new Event("change"));
+function trigger()
+{
+  element.dispatchEvent(new Event("change"));
+}
+
+setInterval(trigger, 5000);

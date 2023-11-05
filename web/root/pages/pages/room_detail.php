@@ -363,12 +363,9 @@
         <input type="hidden" value="<?php echo $current_room ?>" id="room_id" ?>
         <div class='row mt-4'> 
             <div class="col-7 text-center" style="margin: 0px auto">
-               <div class="row" style="width: 100%; height: 90%;">
+               <div class="row" style="width: 100%; height: 100%;">
                   <img id="image" name="<?php echo $current_room ?>" style="margin: 5px; height:90%;">
                </div>
-               <div class="row">
-                  <button id="get_room_image" type="button" class="btn btn-primary" style="width:80%; margin:5px auto;">Get room image</button>
-              </div>
             </div>
             <div class="col-5">
                 <div class="row">
@@ -394,7 +391,7 @@
                                         <canvas id="humid-chart" class="chart-canvas" height="170"></canvas>
                                     </div>
                                 </div>
-
+                                <h6 class="ms-2 mt-4 mb-0">Last 10 record of humidity</h6>
                             </div>
                         </div>
                     </div>
@@ -437,7 +434,7 @@
 
                       <td class="align-middle d-flex justify-content-center">
                         <div class="form-check form-switch ps-0">
-                          <input class="form-check-input mt-1 ms-auto" name="switch_status" value="<?php echo $house_id.$room_info['room_id'].$device['device_id']; ?>" type="checkbox" 
+                          <input class="form-check-input mt-1 ms-auto" name="switch_status" value="<?php echo $house_id.$current_room.$device['device_id']; ?>" type="checkbox" 
                           <?php echo ($device['status']==1 ? "checked" :  ""); ?>>
                         </div>
                       </td>

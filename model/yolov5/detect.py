@@ -1,44 +1,35 @@
 import argparse
 import time
-from pathlib import Path
 
 import cv2
 import torch
-import torch.backends.cudnn as cudnn
-from numpy import random
+
 
 from models.experimental import attempt_load
-from utils.datasets import LoadStreams, LoadImages
-from utils.general import check_img_size, check_requirements, check_imshow, non_max_suppression, apply_classifier, \
-    scale_coords, xyxy2xywh, strip_optimizer, set_logging, increment_path
+from utils.datasets import LoadImages
+from utils.general import check_img_size, non_max_suppression,  \
+    scale_coords, set_logging
 from utils.plots import plot_one_box
-from utils.torch_utils import select_device, load_classifier, time_synchronized
-import time
+from utils.torch_utils import select_device, time_synchronized
 
-start_time = time.time()
 
-source = 'test.jpg'
+
+
+
 weights = ['crowdhuman_yolov5m.pt']
-save_dir = './save'
-imgsz = 480
+root_dir = './var/www/image'
+imgsz = 200
 device = select_device('cpu')
-set_logging()
+#set_logging()
 model = attempt_load(weights, map_location=device)
 stride = int(model.stride.max())  # model stride
 imgsz = check_img_size(imgsz, s=stride)
 #half = False  # half precision only supported on CUDA
-names = model.module.names if hasattr(model, 'module') else model.names
+names =  model.names
 
-def detect(dataset, save_name, save_img=True):
-
-    # Get names and colors
-    
-
-    # Run inference
-    if device.type != 'cpu':
-        model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
+def detect(dataset, save_path, save_img=True):
         
-    for path, img, im0s, vid_cap in dataset:
+    for _, img, im0s, _ in dataset:
         img = torch.from_numpy(img).to(device)
         img = img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -50,17 +41,16 @@ def detect(dataset, save_name, save_img=True):
 
         # Apply NMS
         pred = non_max_suppression(pred, 0.25, 0.45, classes=opt.classes, agnostic=opt.agnostic_nms)
-        t2 = time_synchronized()
+        #t2 = time_synchronized()
 
 
         # Process detections
-        for i, det in enumerate(pred):  # detections per image
+        for _, det in enumerate(pred):  # detections per image
 
-            im0, frame = im0s, getattr(dataset, 'frame', 0)
+            im0, _ = im0s, getattr(dataset, 'frame', 0)
 
-            save_path = save_dir + '/' + save_name  # img.jpg
             #s += '%gx%g ' % img.shape[2:]  # print string
-            gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
+            #gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
             if len(det):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
@@ -75,7 +65,7 @@ def detect(dataset, save_name, save_img=True):
                     if save_img:  # Add bbox to image
                         label = f'{names[int(cls)]} {conf:.2f}'
                         if 'person' in label:
-                            plot_one_box(xyxy, im0, label=label, color=[0, 0, 0], line_thickness=5)
+                            plot_one_box(xyxy, im0, label=label, color=[0, 0, 0], line_thickness=3)
                             #detect có người, send mqtt hoặc gì đó
                             #process here, not implemented yet
                            
@@ -105,20 +95,22 @@ opt = parser.parse_args()
 
 
 import os
-root_dir = './test'
+import psutil
+with torch.no_grad():
+    while True:
+        for dir in os.listdir(root_dir):
+            house = os.path.join(root_dir, dir)
+            for subdir in os.listdir(house):
+                room = os.path.join(house, subdir)
+                # checking if it is a file
+                save_path = os.path.join(room, 'processed_result.png')
+                image_path = os.path.join(room, 'result.png')
+                if os.path.isfile(image_path):
+                    dataset = LoadImages(image_path, img_size=imgsz, stride=stride)
+                    detect(dataset, save_path)
+        print(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2)  
+        time.sleep(1)
 
-"""
-while True:
-    time.sleep(1000)
-    for dir in os.listdir(root_dir):
-        house = os.path.join(root_dir, dir)
-        for subdir in os.listdir(house):
-            room = os.path.join(house, subdir)
-            # checking if it is a file
-            image_path = os.path.join(room, 'result.png')
-            dataset = LoadImages(image_path, img_size=imgsz, stride=stride)
-            with torch.no_grad():
-                detect(dataset)
 """
 while True:
     time.sleep(1)
@@ -129,3 +121,4 @@ while True:
         with torch.no_grad():
                 detect(dataset, str(dir))
     print('done 1 time')
+"""
