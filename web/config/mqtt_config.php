@@ -14,7 +14,7 @@ $password = '';
 
 $connectionSettings = (new ConnectionSettings)
   ->setUsername($username)
-  ->setPassword($password)->setKeepAliveInterval(60);
+  ->setPassword($password)->setSocketTimeout(2);
 
 
 $mqtt = new MqttClient($server, $port, $clientId);

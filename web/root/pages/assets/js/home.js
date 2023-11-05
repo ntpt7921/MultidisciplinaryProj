@@ -182,13 +182,13 @@ updateClock(); // initial call
 
 devices = document.getElementsByName('switch_status');
   devices.forEach(device => {
-    device.addEventListener('click', function(){
+    device.addEventListener('change', function(){
       ids = device.value.split('');
       house_id = ids[0];
       room_id = ids[1];
       device_id = ids[2];
-      if(device.checked) request = 'turn on';
-      else request = 'turn off';
+      if(device.checked) request = 1;
+      else request = 0;
       $.ajax({
         url : "https://bk-hk231-dadn-smarthome.link/services/send_request_to_device.php",
         type: 'post',
@@ -206,10 +206,8 @@ devices = document.getElementsByName('switch_status');
             }
             else
             {
-              if (request == 'turn on') device.checked = false;
+              if (request == 1) device.checked = false;
               else device.checked = true;
-              console.log(device.checked);
-              console.log(request);
             }
         }
       })
