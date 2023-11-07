@@ -1,7 +1,7 @@
 <?php
 
     include("../../config/cors.php");
-    if(!isset($_COOKIE['token'])  || !isset($_POST['room_id']) || !isset($_POST['device_id']))
+    if(!isset($_COOKIE['token'])  || !isset($_POST['room_id']))
     {
         echo json_encode(['status' => 'Failed']);
     }
@@ -28,13 +28,16 @@
             }
             else
             {
+                
                 //get house id
                 $query = "select house_id from house where usr_id=$usr_id";
                 $result = mysqli_query($connection, $query);
                 $data = mysqli_fetch_assoc($result);
                 $house_id = $data['house_id'];
 
+                
                 //get devices
+                $room_id = $_POST['room_id'];
                 $query = "select device_id, status from devices where house_id=$house_id and room_id=$room_id";
                 $result = mysqli_query($connection, $query);
                 $devices = [];

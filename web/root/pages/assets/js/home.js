@@ -1,4 +1,5 @@
-
+var chart1 = null;
+var chart2 = null;
 function update()
 {
   $.ajax({
@@ -16,8 +17,12 @@ function update()
         document.getElementById('temper').innerHTML = data[0]+" ";
         
         var temp = document.getElementById("temp-chart").getContext("2d");
+        if(chart1){
+          chart1.clear();
+          chart1.destroy();
+      }
         //Temerature chart
-        new Chart(temp, {
+        chart1 = new Chart(temp, {
           type: "bar",
           data: {
             labels: label, //Change time here
@@ -99,8 +104,11 @@ function update()
         document.getElementById('humid').innerHTML = data[0]+" ";
   
         var humid = document.getElementById("humid-chart").getContext("2d");
-  
-        new Chart(humid, {
+        if(chart2){
+          chart2.clear();
+          chart2.destroy();
+        }
+        chart2 = new Chart(humid, {
           type: "bar",
           data: {
             labels: label, //Change time here
@@ -167,8 +175,48 @@ function update()
   })
 }
 
+function update_devices()
+{
+  rooms = document.getElementsByName('room');
+  rooms_id = [];
+  rooms.forEach(room => {
+    rooms_id.push(room.id);
+  });
+  rooms_id.forEach(id => {
+    $.ajax({
+      url : "https://bk-hk231-dadn-smarthome.link/services/get_device_status.php",
+      type: 'post',
+      data: {
+          room_id : id,
+      },
+      success: function(res){	
+        res = JSON.parse(res);
+        if (res['status'] == 'success')
+        {
+          devices_status = res['devices'];
+          devices_status.forEach(status => {
+             element_id = "room_" + id + "_device_" + status['device_id'];
+             element = document.getElementById(element_id);
+             if (status['status'] == 1)
+             {
+              element.checked = true;
+             }
+             else
+             {
+              element.checked = false;
+             }
+          });
+        }
+      }
+    })
+  })
+  
+}
+
 update();
-setInterval(update, 5);
+update_devices()
+setInterval(update, 5000);
+setInterval(update_devices, 1000);
 
 function updateClock() {
   var now = new Date(), // current date

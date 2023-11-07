@@ -1,8 +1,9 @@
 var chart = null;
-
-document.getElementById('select_sensor').addEventListener('change', function(){
-    if(this.value == "Humidity") table = 'cambien_doam';
-    else if (this.value == "Temperature") table = 'cambien_nhietdo';
+sensor = document.getElementById('select_sensor');
+function update()
+{
+    if(sensor.value == "Humidity") table = 'cambien_doam';
+    else if (sensor.value == "Temperature") table = 'cambien_nhietdo';
 
     $.ajax({
         url : "https://bk-hk231-dadn-smarthome.link/services/get_latest_value.php",
@@ -38,7 +39,7 @@ document.getElementById('select_sensor').addEventListener('change', function(){
         },
     })
     
-    type = this.value.toLowerCase();
+    type = sensor.value.toLowerCase();
     
     room_name = {};
     //data for chart
@@ -111,7 +112,7 @@ document.getElementById('select_sensor').addEventListener('change', function(){
 
    
 
-
+    
 
    chart = new Chart(ctx0, {
      type: "line",
@@ -120,6 +121,9 @@ document.getElementById('select_sensor').addEventListener('change', function(){
        datasets: datasets,
      },
      options: {
+      animation: {
+        duration: 0
+      },
        responsive: true,
        maintainAspectRatio: false,
        plugins: {
@@ -178,13 +182,15 @@ document.getElementById('select_sensor').addEventListener('change', function(){
    // End Chart
    var icons = document.getElementsByName('icon');
 
-   if(this.value == "Temperature") clss = "bi bi-thermometer text-lg opacity-10";
+   if(sensor.value == "Temperature") clss = "bi bi-thermometer text-lg opacity-10";
    else clss = "<bi bi-moisture text-lg opacity-10";
    icons.forEach((icon, ind) => {
       icon.className = clss;
    })
    
-})
+
+}
+sensor.addEventListener('change', update);
 
 function getData(type, room_id, d)
 {
@@ -207,12 +213,5 @@ function getData(type, room_id, d)
     });
 }
     
-
-let element = document.getElementById('select_sensor');
-element.dispatchEvent(new Event("change"));
-function trigger()
-{
-  element.dispatchEvent(new Event("change"));
-}
-
-setInterval(trigger, 5000);
+update();
+setInterval( update, 10000);
