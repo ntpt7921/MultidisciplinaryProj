@@ -45,13 +45,14 @@ Functionality:
 ## MQTT message format
 
 We assume that there is multiple implementation of the system, each with different `room_id` and
-`house_id`. All instance of the system will send/receive by the same centralized topic. So to
+`house_id`. Each room may also have multiple device to control, so `device_id` to differentiate them
+is used. All instance of the system will send/receive by the same centralized topic. So to
 differentiate each instance, every packet of information sent/received by the system must have the
-following format: `<house_id>;<room_id>;<content>`.
+following format: `<house_id>;<room_id>;<device_id>;<content>`.
 
 Each Yolo:bit instance is expected to be able to parse the packet, determining if the packet is
-directed toward itself or not. If `house_id` and `room_id` match, then process the content; if not
-then discard the packet.
+directed toward itself or not. If `house_id`, `room_id` and `device_id` match (if applicable), then
+process the content; if not then discard the packet.
 
 ## Control signal sent through MQTT topics
 
@@ -175,8 +176,8 @@ For the light on/off control, activation can also be achieved through
 - User control
 - PIR motion detection at night.
 
-The set RGB triplet will persist up until the automatically turn off. When it automatically turn on
-again, the color will be fixed (hard-coded), user have to change this again.
+The set RGB triplet will persist up until automatically turned off. When it is automatically turned
+on again, the color will be fixed (hard-coded), user have to change this again.
 
 ```mermaid
 stateDiagram-v2
@@ -298,8 +299,7 @@ stateDiagram-v2
     note right of automatic
     There are 3 sub-states:
     - User not detected: door is close
-    - Identification delay: door is close, send invoke signal to
-      camera-attached device for face ID
+    - Identification delay: door is close, wait for face ID result
     - User detected: door is open
 
     We assume that the face ID camera is always able to capture
