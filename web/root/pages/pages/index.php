@@ -422,7 +422,7 @@
         <div class="col-sm-4 mb-lg-0 mb-4">
           <div class="card z-index-2">
             <div class="card-body p-3">
-              <h6 class="ms-2 mt-0 mb-2"><?php echo $room_info['room_name']; ?></h6>
+              <h6 class="ms-2 mt-0 mb-2" name="room" id="<?php echo $room_info['room_id']; ?>"><?php echo $room_info['room_name']; ?></h6>
               <div class="table-responsive">
                 <table class="table align-items-center mb-0">
                   <thead>
@@ -444,7 +444,7 @@
                       <td>
                         <div class="form-check form-switch ps-0">
                           <input class="form-check-input mt-1 ms-auto" name="switch_status" value="<?php echo $house_id.$room_info['room_id'].$device['device_id']; ?>" type="checkbox" 
-                          <?php echo ($device['status']==1 ? "checked" :  ""); ?>>
+                          <?php echo ($device['status']==1 ? "checked" :  ""); ?> id="room_<?php echo $room_info['room_id'] ?>_device_<?php echo $device['device_id']; ?>">
                         </div>
                       </td>
                     </tr>

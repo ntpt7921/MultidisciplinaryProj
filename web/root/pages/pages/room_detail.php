@@ -435,7 +435,7 @@
                       <td class="align-middle d-flex justify-content-center">
                         <div class="form-check form-switch ps-0">
                           <input class="form-check-input mt-1 ms-auto" name="switch_status" value="<?php echo $house_id.$current_room.$device['device_id']; ?>" type="checkbox" 
-                          <?php echo ($device['status']==1 ? "checked" :  ""); ?>>
+                          <?php echo ($device['status']==1 ? "checked" :  ""); ?> id="device_<?php echo $device['device_id']?>">
                         </div>
                       </td>
                     </tr>

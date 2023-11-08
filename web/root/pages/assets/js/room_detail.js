@@ -1,5 +1,10 @@
+var chart1 = null;
+var chart2 = null;
+
 room_id = document.getElementById('room_id').value;
-$.ajax({
+function updateChart()
+{
+  $.ajax({
     url : "https://bk-hk231-dadn-smarthome.link/services/get_data.php",
     type: 'post',
     data: {
@@ -14,7 +19,12 @@ $.ajax({
         
         var temp = document.getElementById("temp-chart").getContext("2d");
         //Temerature chart
-        new Chart(temp, {
+        if(chart1)
+        {
+          chart1.clear();
+          chart1.destroy();
+        }
+        chart1 = new Chart(temp, {
           type: "bar",
           data: {
             labels: label, //Change time here
@@ -30,6 +40,9 @@ $.ajax({
             },],
           },
           options: {
+            animation: {
+              duration: 0
+            },
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -94,8 +107,12 @@ $.ajax({
         label = Object.values(res['label'].reverse());
   
         var humid = document.getElementById("humid-chart").getContext("2d");
-  
-        new Chart(humid, {
+        if(chart2)
+        {
+          chart2.clear();
+          chart2.destroy();
+        }
+        chart2 = new Chart(humid, {
           type: "bar",
           data: {
             labels: label, //Change time here
@@ -111,6 +128,9 @@ $.ajax({
             },],
           },
           options: {
+            animation: {
+              duration: 0
+            },
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -160,8 +180,45 @@ $.ajax({
         });
     }
   })
+}
+
+function update_devices()
+{
+  room = document.getElementById('image').name;
+  $.ajax({
+      url : "https://bk-hk231-dadn-smarthome.link/services/get_device_status.php",
+      type: 'post',
+      data: {
+          room_id : room,
+      },
+      success: function(res){	
+        res = JSON.parse(res);
+        if (res['status'] == 'success')
+        {
+          devices_status = res['devices'];
+          devices_status.forEach(status => {
+             element_id = "device_" + status['device_id'];
+             element = document.getElementById(element_id);
+             if (status['status'] == 1)
+             {
+              element.checked = true;
+             }
+             else
+             {
+              element.checked = false;
+             }
+          });
+        }
+      }
+    })
+}
+  
 
 
+updateChart();
+update_devices();
+setInterval(updateChart, 5000);
+setInterval(update_devices, 5000);
   function update_image()
   {
     var img = document.getElementById('image');
