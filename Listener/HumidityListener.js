@@ -1,7 +1,6 @@
 const mqtt = require("mqtt")
 const moment = require('moment');
 const db_connect = require('./DBconnection');
-const fs = require('fs');
 
 
 
@@ -17,23 +16,20 @@ client.on('connect', function () {
 // Receive messages
 client.on('message', (topic, message)=> {
 	//process message
-	var message = message.toString();
+	var message = message.toString().split(';');
 	//console.log(message);
-	console.log("recieving new data");
-	dateString = moment().format('MMMM Do YYYY, h:mm:ss a'); //get current time
-	fs.appendFileSync('/var/www/temp/humidity.txt', message+' date: ' + dateString + '\n');
-	console.log('data saved to /var/www/temp/humidity.txt');
+	house_id = message[0];
+	room_id = message[1];
+	device_id = message[2];
+	value = message[3];
+	dateString = moment().format('YYYY/MM/DD HH:mm:ss'); //get current time
+	
 
-	/*
-	//insert to database
-	con.connect(function(err){
-		if (!err)
-		{
-			var query = "insert into cambien_nhietdo value ()";
-			con.query(query);
-		} 
+    //do something with the data
+	db_connect.getConnection(function(err){
+		var query = `insert into cambien_nhietdo value (${house_id}, ${room_id},${value}, '${dateString}')`;
+		db_connect.query(query);
 	});
-	*/
 });
 
 
