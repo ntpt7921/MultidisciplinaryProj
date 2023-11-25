@@ -1,8 +1,8 @@
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from '../components/Home';
 import Notification from '../components/Notification';
 import Settings from '../components/Settings';
-const Drawer = createDrawerNavigator();
+const Drawer = createBottomTabNavigator();
 
 function DrawerNavigator() {
   return (
