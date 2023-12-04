@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import { BarChart } from 'react-native-chart-kit';
+import Token from '../classes/Token'
+
 
 
 const BarChartExample = ({ data }) => {
@@ -42,7 +44,6 @@ const BarChartExample = ({ data }) => {
 };
 
 export const WelcomeBack = () => {
-
   const currentDate = new Date();
   const formattedDate = currentDate.toUTCString()
 

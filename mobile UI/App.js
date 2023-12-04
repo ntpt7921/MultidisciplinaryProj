@@ -12,12 +12,46 @@ import { Card } from 'react-native-paper';
 import DrawerNavigator from './navigators/Drawer'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import axios from 'axios';
 
 // or any files within the Snack
 import Home from './components/Home';
+import Token from './classes/Token.js';
+import Url from './classes/Url.js';
 import { useState } from 'react';
+import { Alert } from 'react-native';
+
+
+async function authenticate(username, password, navigation)
+{
+  try{
+    var result = await axios.post(Url.ServiceUrl + "authentication.php", {
+      username : username,
+      password : password
+    }, {
+      headers : {
+        "Content-type" : "multipart/form-data"
+      }
+    })
+    var data = result.data
+    if (data.status == "Success") 
+    {
+      Token.value = data.token
+      navigation.navigate('Drawer')
+    }
+
+  }catch(e){
+    Alert.alert(
+      'Error',
+      'Sorry, cannot access server at this time'
+    );
+  }
+
+}
 
 export const Login = ({ navigation }) => {
+  const [username, setUsername] = useState(''); 
+  const [password, setPassword] = useState(''); 
 
   return (
     <ImageBackground
@@ -52,9 +86,11 @@ export const Login = ({ navigation }) => {
               borderColor: 'lightgray',
               borderWidth: 0.3,
             }}
-            name="email"
-            placeholder="Email"
+            name="username"
+            placeholder="Username"
             placeholderTextColor="gray"
+            onChangeText={(value) => setUsername(value)}
+            value={username}
           />
           <TextInput
             style={{
@@ -70,12 +106,14 @@ export const Login = ({ navigation }) => {
             name="password"
             placeholder="Password"
             placeholderTextColor="gray"
+            onChangeText={(value) => setPassword(value)}
+            value={password}
           />
         </View>
         <View style={{ alignItems: 'center', paddingBottom: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: '#e91e63', width: '50%', height: 40, borderRadius: 5, alignItems:'center', justifyContent:'center' }}
-            onPress={()=>{navigation.navigate('Drawer')}}
+            onPress={()=>{authenticate(username, password, navigation)}}
           >
             <Text style={{color: 'white'}}>Login</Text>
             </TouchableOpacity>
@@ -84,6 +122,7 @@ export const Login = ({ navigation }) => {
     </ImageBackground>
   );
 };
+
 
 const Stack = createStackNavigator();
 
