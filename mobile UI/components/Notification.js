@@ -2,14 +2,9 @@ import react, { useState } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
-  TextInput,
   ScrollView,
-  StyleSheet,
-  Dimensions,
+  StyleSheet, ImageBackground
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-
 export default Notification = ({ navigation }) => {
   const [clickedIndex, setClickedIndex] = useState(0);
 
@@ -18,62 +13,14 @@ export default Notification = ({ navigation }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f0f2f5' }}>
-      <View
-        style={{
-          flex: 1,
-          paddingHorizontal: 10,
-          marginHorizontal: 20,
-          paddingTop: 10,
-          marginTop: 20,
-          borderRadius: 10,
-          backgroundColor: 'white',
-        }}>
-        <View
-          style={{
-            paddingVertical: 10,
-          }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Notifications</Text>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <View style={{ width: '50%' }}>
-            <TextInput
-              style={{
-                backgroundColor: 'lightgray',
-                height: 30,
-                paddingHorizontal: 5,
-                borderRadius: 5,
-              }}
-              placeholder="Search..."
-              placeholderTextColor="#d81b60"
-            />
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity style={{ paddingRight: 6 }}>
-              <Icon name="user" size={20} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{ paddingRight: 6 }}
-              onPress={() => navigation.openDrawer()}>
-              <Icon name="bars" size={20} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity style={{ paddingRight: 6 }}>
-              <Icon name="cog" size={20} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity style={{ paddingRight: 6 }} onPress={()=>navigation.navigate('Notification')}>
-              <Icon name="bell" size={20} color="black" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+    <ImageBackground
+      source={require('../assets/mainBG.jpg')}
+      style={{ flex: 1, justifyContent: 'center', width: '100%', height: '100%' }}>
+
       <View style={{ flex: 5 }}>
         <ScrollView style={{ flex: 5 }}>
           <View
-            style={[container.shadowBox,{
+            style={[container.shadowBox, {
               marginHorizontal: 20,
               marginTop: 20,
               backgroundColor: 'white',
@@ -118,7 +65,7 @@ export default Notification = ({ navigation }) => {
             </View>
           </View>
           <View
-            style={[container.shadowBox,{
+            style={[container.shadowBox, {
               marginHorizontal: 20,
               marginTop: 20,
               backgroundColor: 'white',
@@ -166,7 +113,7 @@ export default Notification = ({ navigation }) => {
           </View>
         </ScrollView>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 

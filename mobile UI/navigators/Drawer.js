@@ -1,7 +1,8 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import Home from '../components/Home';
 import Notification from '../components/Notification';
-import Settings from '../components/Settings';
+
 const Drawer = createBottomTabNavigator();
 
 function DrawerNavigator() {
@@ -11,9 +12,16 @@ function DrawerNavigator() {
       screenOptions={{
         headerShown: false, // Hide the header for all screens by default
       }}>
-      <Drawer.Screen name="Home" component={Home} />
-      <Drawer.Screen name="Settings" component={Settings} />
-      <Drawer.Screen name="Notification" component={Notification} />
+      <Drawer.Screen name="Home" component={Home} options={{
+        tabBarIcon: ({ color, size }) => (
+          <Icon name="home" color={color} size={25} />
+        ),
+      }} />
+      <Drawer.Screen name="Notification" component={Notification} options={{
+        tabBarIcon: ({ color, size }) => (
+          <Icon name="bell" color={color} size={20} />
+        ),
+      }} />
     </Drawer.Navigator>
   );
 }
