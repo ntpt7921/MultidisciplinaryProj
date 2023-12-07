@@ -11,8 +11,10 @@ import {
 } from 'react-native';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import { BarChart } from 'react-native-chart-kit';
-import Token from '../classes/Token'
-
+import User from '../classes/User'
+import axios from 'axios';
+import Url from '../classes/Url'
+import RequestConfig from '../classes/RequestConfig';
 
 
 const BarChartExample = ({ data }) => {
@@ -125,11 +127,40 @@ export function QuickAccess() {
 }
 
 export default Home = ({ navigation }) => {
-  const [clickedIndex, setClickedIndex] = useState(0);
-
+  const [clickedIndex, setClickedIndex] = useState(1);
+  const [roomImg, setRoomImg] = useState('');
   const handlePress = (index) => {
     setClickedIndex(index);
+    User.current_room = index;
+    setRoomImg('');
   };
+
+  useEffect(() => {
+    var intervalId = setInterval(async () => {
+      try{
+        var res = await axios.post(Url.ServiceUrl+"get_room_image.php", {
+          room_id : User.current_room
+        }, RequestConfig.useCookieConfig(User.token));
+
+        var data = res.data;
+        if(data.status == "success")
+        {
+          //console.log(clickedIndex);
+          if(data.room_id == User.current_room) setRoomImg(data.image);
+          else setRoomImg('');
+        }
+      }
+      catch(e)
+      {
+
+      }   
+    }, 1000)
+
+    return () => {
+      clearInterval(intervalId);
+    }
+  })
+
 
   const chartdata = {
     labels: ['01:00', '02:00', '03:00', '04:00', '05:00', '06:00'],
@@ -155,11 +186,7 @@ export default Home = ({ navigation }) => {
             <Card.Cover
               style={{ borderRadius: 10, height: 200 }}
               source={
-                clickedIndex === 0
-                  ? require('../assets/home-decor-1.jpg')
-                  : clickedIndex === 1
-                    ? require('../assets/home-decor-2.jpg')
-                    : require('../assets/home-decor-3.jpg')
+                roomImg == "" ? require("../assets/loading.png") : {uri : roomImg}
               }
             />
             <Card.Content
@@ -181,18 +208,10 @@ export default Home = ({ navigation }) => {
                 <TouchableOpacity
                   style={[
                     button.style1,
-                    clickedIndex === 0 && button.activedButton,
-                  ]}
-                  onPress={() => handlePress(0)}>
-                  <Text style={{ textAlign: 'center' }}>Kitchen</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    button.style1,
                     clickedIndex === 1 && button.activedButton,
                   ]}
                   onPress={() => handlePress(1)}>
-                  <Text style={{ textAlign: 'center' }}>Living Room</Text>
+                  <Text style={{ textAlign: 'center' }}>Kitchen</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
@@ -200,6 +219,14 @@ export default Home = ({ navigation }) => {
                     clickedIndex === 2 && button.activedButton,
                   ]}
                   onPress={() => handlePress(2)}>
+                  <Text style={{ textAlign: 'center' }}>Living Room</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    button.style1,
+                    clickedIndex === 3 && button.activedButton,
+                  ]}
+                  onPress={() => handlePress(3)}>
                   <Text style={{ textAlign: 'center' }}>Store House</Text>
                 </TouchableOpacity>
               </Card.Content>

@@ -16,8 +16,9 @@ import axios from 'axios';
 
 // or any files within the Snack
 import Home from './components/Home';
-import Token from './classes/Token.js';
+import User from './classes/User.js';
 import Url from './classes/Url.js';
+import RequestConfig from './classes/RequestConfig.js';
 import { useState } from 'react';
 import { Alert } from 'react-native';
 
@@ -28,15 +29,12 @@ async function authenticate(username, password, navigation)
     var result = await axios.post(Url.ServiceUrl + "authentication.php", {
       username : username,
       password : password
-    }, {
-      headers : {
-        "Content-type" : "multipart/form-data"
-      }
-    })
+    }, RequestConfig.useNoneCookieConfig())
     var data = result.data
     if (data.status == "Success") 
     {
-      Token.value = data.token
+      User.token = data.token
+      User.name = data.name
       navigation.navigate('Drawer')
     }
 
