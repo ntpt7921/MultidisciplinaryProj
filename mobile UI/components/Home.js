@@ -75,12 +75,48 @@ export const WelcomeBack = () => {
   )
 }
 
-export function QuickAccess() {
+export function QuickAccess(props) {
+  const {clickedIndex} = props
   const [isEnabled, setIsEnabled] = useState(false);
-
-  const toggleSwitch = () => {
-    setIsEnabled((previousState) => !previousState);
+  const [devices, setDevices] = useState([]);
+  
+  const toggleSwitch = async (device) => {
+    let request = {
+      room_id : device.room_id,
+      house_id : device.house_id,
+      device_id : device.device_id,
+      request : device.status == 1 ? "turn off" : "turn on"
+    }
+    //console.log(device);
+    await axios.post(Url.ServiceUrl+"send_request_to_device.php", request, RequestConfig.useCookieConfig(User.token));
+    //console.log(data);
   };
+
+  //console.log(clickedIndex);
+  let get_devices = async () => {
+    let result = await axios.post(Url.ServiceUrl+"get_device_status.php", {
+      room_id : clickedIndex
+    }, RequestConfig.useCookieConfig(User.token));
+
+    var data = result.data;
+    if(data.status == "success")
+    {
+      setDevices(data.devices);
+    }
+   //console.log(devices);
+  }
+
+  useEffect(() => {
+    var intervalId = setInterval(async () => {
+      get_devices();
+    }, 1000)
+
+    return () => {
+      clearInterval(intervalId);
+    }
+  }, [clickedIndex])
+
+  //console.log(devices);
   return (
     <View
       style={[
@@ -91,36 +127,23 @@ export function QuickAccess() {
         <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Quick Access</Text>
       </View>
       <View style={{ marginTop: 10 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-          <Text>Light</Text>
-          <Switch
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-          />
-        </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-          <Text>Camera</Text>
-          <Switch
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-          />
-        </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-          <Text>Wifi</Text>
-          <Switch
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-          />
-        </View>
+          {devices.length != 0 ? (<>{
+            devices.map((device, index) => {
+
+              return (<View key={device.device_id}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+              <Text>{device.device_name}</Text>
+              <Switch
+                trackColor={{ false: '#767577', true: '#81b0ff' }}
+                thumbColor={device.status ? '#f5dd4b' : '#f4f3f4'}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={() => toggleSwitch(device)} //mai làm
+                value={(device.status == 1 ? true : false)}
+              />
+            </View>
+            </View>)
+            })
+          }</>) : ""}
       </View>
     </View>
   );
@@ -129,6 +152,12 @@ export function QuickAccess() {
 export default Home = ({ navigation }) => {
   const [clickedIndex, setClickedIndex] = useState(1);
   const [roomImg, setRoomImg] = useState('');
+  const [rooms, setRooms] = useState([]);
+  const [temperature, setTemperature] = useState([10000]);
+  const [humidity, setHumidity] = useState([10000]);
+  const [temperature_chart_data, setTemperatureChartData] = useState({label : [], data : []})
+  const [humidity_chart_data, setHumidityChartData] =  useState({label : [], data : []})
+
   const handlePress = (index) => {
     setClickedIndex(index);
     User.current_room = index;
@@ -161,15 +190,138 @@ export default Home = ({ navigation }) => {
     }
   })
 
+  useEffect(() => {
+    var intervalId = setInterval(async () => {
+      try{
+        var res = await axios.post(Url.ServiceUrl+"get_data.php", {
+          type : "temperature",
+          room_id : clickedIndex,
+          number : 5
+        }, RequestConfig.useCookieConfig(User.token));
 
-  const chartdata = {
-    labels: ['01:00', '02:00', '03:00', '04:00', '05:00', '06:00'],
+        var data = res.data;
+        if(data.status == "success")
+        {
+          //console.log(data);
+          let label = [];
+          data.label.forEach(ele => {
+            label.push(ele.split(" ")[1]);
+          })
+          //console.log(label);
+          setTemperatureChartData({label : label, data : data.data});
+        }
+
+        var result = await axios.post(Url.ServiceUrl+"get_data.php", {
+          type : "humidity",
+          room_id : clickedIndex,
+          number : 5
+        }, RequestConfig.useCookieConfig(User.token));
+
+        var data_ = result.data;
+        if(data_.status == "success")
+        {
+          //console.log(data);
+          let label_ = [];
+          data_.label.forEach(ele => {
+            label_.push(ele.split(" ")[1]);
+          })
+          //console.log(label_);
+          setHumidityChartData({label : label_, data : data_.data});
+        }
+      }
+      catch(e)
+      {
+
+      }   
+    }, 3000)
+
+    return () => {
+      clearInterval(intervalId);
+    }
+  }, [clickedIndex])
+
+  const chartdata_temperature = {
+    labels: temperature_chart_data.label,
     datasets: [
       {
-        data: [20, 45, 28, 80, 99, 43],
+        data: temperature_chart_data.data,
       },
     ],
   };
+
+  const chartdata_humidity = {
+    labels: humidity_chart_data.label,
+    datasets: [
+      {
+        data: humidity_chart_data.data,
+      },
+    ],
+  };
+
+  let get_rooms = async () => {
+    let result = await axios.post(Url.ServiceUrl+"get_rooms.php", {
+        id : 123
+    }, RequestConfig.useCookieConfig(User.token));
+    var data = result.data;
+    //console.log(result);
+    if(data.status == "success")
+    {
+      setRooms(data.data);
+    }
+  }
+
+  useEffect(() => {
+    try{
+      get_rooms();
+      get_temperature();
+      get_humidity();
+    }
+    catch(e){
+
+    }
+    
+  }, []);
+
+  useEffect(() => {
+    try{
+      get_temperature();
+      get_humidity();
+    }
+    catch(e){
+
+    }
+    
+  }, [clickedIndex]);
+
+
+  //console.log(rooms[0].room_name);
+
+  let get_temperature = async () => {
+    let result = await axios.post(Url.ServiceUrl + "get_data.php", {
+      type : "temperature",
+      room_id : clickedIndex,
+      number : 1
+    }, RequestConfig.useCookieConfig(User.token));
+
+    let data = result.data;
+    if(data.status == "success")
+    {
+      setTemperature(data.data);
+    }
+  }
+
+  let get_humidity = async () => {
+    let result = await axios.post(Url.ServiceUrl + "get_data.php", {
+      type : "humidity",
+      room_id : clickedIndex,
+      number : 1
+    }, RequestConfig.useCookieConfig(User.token));
+    let data = result.data;
+    if(data.status == "success")
+    {
+      setHumidity(data.data);
+    }
+  }
 
   return (
     <ImageBackground
@@ -205,30 +357,21 @@ export default Home = ({ navigation }) => {
                   paddingHorizontal: 0,
                   alignItems: 'center',
                 }}>
-                <TouchableOpacity
-                  style={[
-                    button.style1,
-                    clickedIndex === 1 && button.activedButton,
-                  ]}
-                  onPress={() => handlePress(1)}>
-                  <Text style={{ textAlign: 'center' }}>Kitchen</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    button.style1,
-                    clickedIndex === 2 && button.activedButton,
-                  ]}
-                  onPress={() => handlePress(2)}>
-                  <Text style={{ textAlign: 'center' }}>Living Room</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    button.style1,
-                    clickedIndex === 3 && button.activedButton,
-                  ]}
-                  onPress={() => handlePress(3)}>
-                  <Text style={{ textAlign: 'center' }}>Store House</Text>
-                </TouchableOpacity>
+                  
+                {rooms.length != 0 ? (<>{
+                  rooms.map((room, index) => {
+                    return (
+                      <TouchableOpacity key={index}
+                      style={[
+                        button.style1,
+                        clickedIndex === room[0] && button.activedButton,
+                      ]}
+                      onPress={() => handlePress(room[0])}>
+                      <Text style={{ textAlign: 'center' }}>{room[2]}</Text>
+                    </TouchableOpacity>
+                    )
+            })
+          }</>) : ""}
               </Card.Content>
             </Card.Content>
           </Card>
@@ -239,7 +382,7 @@ export default Home = ({ navigation }) => {
               styles.shadowBox,
               { backgroundColor: 'white', borderRadius: 10 },
             ]}>
-            <BarChartExample data={chartdata} />
+            <BarChartExample data={chartdata_temperature} />
             <View style={{ paddingLeft: 20, paddingVertical: 10 }}>
               <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
                 Temperature
@@ -252,7 +395,7 @@ export default Home = ({ navigation }) => {
               styles.shadowBox,
               { backgroundColor: 'white', borderRadius: 10, marginTop: 20 },
             ]}>
-            <BarChartExample data={chartdata} />
+            <BarChartExample data={chartdata_humidity} />
             <View style={{ paddingLeft: 20, paddingVertical: 10 }}>
               <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
                 Humidity
@@ -271,47 +414,23 @@ export default Home = ({ navigation }) => {
             }}>
             <Card.Content style={[styles.shadowBox, card.container]}>
               <View style={{ flexDirection: 'row' }}>
-                <Title style={{ color: '#e91e63', fontSize: 30 }}>21</Title>
+                <Title style={{ color: '#e91e63', fontSize: 30 }}>{temperature[0] != 10000 ? temperature : "--"}</Title>
                 <Title style={{ color: '#e91e63', fontSize: 20 }}>°C</Title>
               </View>
-              <Paragraph>LivingRoom</Paragraph>
               <Paragraph style={{ color: 'gray' }}>Temperature</Paragraph>
             </Card.Content>
             <Card.Content style={[styles.shadowBox, card.container]}>
               <View style={{ flexDirection: 'row' }}>
-                <Title style={{ color: '#e91e63', fontSize: 30 }}>44</Title>
-                <Title style={{ color: '#e91e63', fontSize: 20 }}>%</Title>
+                <Title style={{ color: '#e91e63', fontSize: 30 }}>{humidity[0] != 10000 ? humidity[0] : "--"} g/m</Title>
+                <Title style={{ color: '#e91e63', fontSize: 20 }}><Text style={{fontSize:15, lineHeight:22}}>3</Text></Title>
               </View>
-              <Paragraph>OutSide</Paragraph>
               <Paragraph style={{ color: 'gray' }}>Humidity</Paragraph>
             </Card.Content>
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingHorizontal: 20,
-              paddingTop: 20,
-            }}>
-            <Card.Content style={[styles.shadowBox, card.container]}>
-              <View style={{ flexDirection: 'row' }}>
-                <Title style={{ color: '#e91e63', fontSize: 30 }}>87</Title>
-                <Title style={{ color: '#e91e63', fontSize: 20 }}>m³</Title>
-              </View>
-              <Paragraph>Water</Paragraph>
-              <Paragraph style={{ color: 'gray' }}>Consumption</Paragraph>
-            </Card.Content>
-            <Card.Content style={[styles.shadowBox, card.container]}>
-              <View style={{ flexDirection: 'row' }}>
-                <Title style={{ color: '#e91e63', fontSize: 30 }}>417</Title>
-                <Title style={{ color: '#e91e63', fontSize: 20 }}>GB</Title>
-              </View>
-              <Paragraph>Internet</Paragraph>
-              <Paragraph style={{ color: 'gray' }}>All devices</Paragraph>
-            </Card.Content>
-          </View>
         </View>
-        <QuickAccess />
+        <QuickAccess 
+          clickedIndex={clickedIndex}
+        />
       </ScrollView>
     </ImageBackground>
   );
