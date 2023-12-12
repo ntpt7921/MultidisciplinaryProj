@@ -90,9 +90,9 @@ the system will responds with it states.
 ### MQTT topics
 
 - Input state:
-    - `<prefix>/report_current state/input`
+    - `<prefix>/report_current_state/input`
 - Output state (we only send door, light, pump, relay, fan)
-    - `<prefix>/report_current state/output`
+    - `<prefix>/report_current_state/output`
 
 ## Environment monitoring
 
