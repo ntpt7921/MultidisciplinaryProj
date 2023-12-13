@@ -85,7 +85,7 @@ export function QuickAccess(props) {
       room_id : device.room_id,
       house_id : device.house_id,
       device_id : device.device_id,
-      request : device.status == 1 ? "turn off" : "turn on"
+      request : device.status == 1 ? 0 : 1
     }
     //console.log(device);
     await axios.post(Url.ServiceUrl+"send_request_to_device.php", request, RequestConfig.useCookieConfig(User.token));

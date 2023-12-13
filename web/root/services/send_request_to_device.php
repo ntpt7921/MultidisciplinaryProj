@@ -58,8 +58,8 @@
                 //define topic here
                 $result = 0;
                 $end_time = time() + 2;
-
-                $mqtt->publish($topic, $_POST['request']);
+                $request = $_POST['house_id'] .';'. $_POST['room_id'] .';'. $_POST['device_id'] .';'. $_POST['request'];
+                $mqtt->publish($topic, $request);
                 $mqtt->subscribe($result_topic, function($topic, $message){
                         global $result ;
                         $result = $message;
