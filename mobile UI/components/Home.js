@@ -81,14 +81,30 @@ export function QuickAccess(props) {
   const [devices, setDevices] = useState([]);
   
   const toggleSwitch = async (device) => {
+    let command = null;
+    if(device.device_name == "fan")
+    {
+      command = device.status == 50 ? 0 : 50
+    }
+    else
+    {
+      command = device.status == "255255255" ? "000000000" : "255255255"
+    }
     let request = {
       room_id : device.room_id,
       house_id : device.house_id,
       device_id : device.device_id,
-      request : device.status == 1 ? 0 : 1
+      request : command
+    }
+    try{
+      await axios.post(Url.ServiceUrl+"send_request_to_device.php", request, RequestConfig.useCookieConfig(User.token));
+    }
+    catch(e)
+    {
+
     }
     //console.log(device);
-    await axios.post(Url.ServiceUrl+"send_request_to_device.php", request, RequestConfig.useCookieConfig(User.token));
+    
     //console.log(data);
   };
 
@@ -108,7 +124,13 @@ export function QuickAccess(props) {
 
   useEffect(() => {
     var intervalId = setInterval(async () => {
-      get_devices();
+      try{
+        get_devices();
+      }
+      catch(e)
+      {
+        
+      }
     }, 1000)
 
     return () => {
@@ -129,7 +151,15 @@ export function QuickAccess(props) {
       <View style={{ marginTop: 10 }}>
           {devices.length != 0 ? (<>{
             devices.map((device, index) => {
-
+              let flag = false;
+              if(device.device_name == "fan")
+              {
+                if(device.status == 50) flag = true;
+              }
+              else
+              { 
+                if(device.status == "255255255") flag = true;
+              }
               return (<View key={device.device_id}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
               <Text>{device.device_name}</Text>
@@ -138,7 +168,7 @@ export function QuickAccess(props) {
                 thumbColor={device.status ? '#f5dd4b' : '#f4f3f4'}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={() => toggleSwitch(device)} //mai làm
-                value={(device.status == 1 ? true : false)}
+                value={flag}
               />
             </View>
             </View>)
@@ -205,7 +235,11 @@ export default Home = ({ navigation }) => {
           //console.log(data);
           let label = [];
           data.label.forEach(ele => {
-            label.push(ele.split(" ")[1]);
+            time = ele.split(" ")[1];
+            time = time.split(":");
+            hour = time[0];
+            minute = time[1];
+            label.push(hour + ":" + minute);
           })
           //console.log(label);
           setTemperatureChartData({label : label, data : data.data});
@@ -223,7 +257,11 @@ export default Home = ({ navigation }) => {
           //console.log(data);
           let label_ = [];
           data_.label.forEach(ele => {
-            label_.push(ele.split(" ")[1]);
+            time = ele.split(" ")[1];
+            time = time.split(":");
+            hour = time[0];
+            minute = time[1];
+            label_.push(hour + ":" + minute);
           })
           //console.log(label_);
           setHumidityChartData({label : label_, data : data_.data});
@@ -360,11 +398,12 @@ export default Home = ({ navigation }) => {
                   
                 {rooms.length != 0 ? (<>{
                   rooms.map((room, index) => {
+                    //console.log(room[0], clickedIndex)
                     return (
                       <TouchableOpacity key={index}
                       style={[
                         button.style1,
-                        clickedIndex === room[0] && button.activedButton,
+                        clickedIndex == room[0] && button.activedButton,
                       ]}
                       onPress={() => handlePress(room[0])}>
                       <Text style={{ textAlign: 'center' }}>{room[2]}</Text>
@@ -387,7 +426,6 @@ export default Home = ({ navigation }) => {
               <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
                 Temperature
               </Text>
-              <Text style={{ fontSize: 15, color: 'gray' }}>Bed Room 1</Text>
             </View>
           </View>
           <View
@@ -400,7 +438,6 @@ export default Home = ({ navigation }) => {
               <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
                 Humidity
               </Text>
-              <Text style={{ fontSize: 15, color: 'gray' }}>Bed Room 1</Text>
             </View>
           </View>
         </View>
