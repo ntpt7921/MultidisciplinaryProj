@@ -129,7 +129,7 @@ export function QuickAccess(props) {
       }
       catch(e)
       {
-        
+
       }
     }, 1000)
 
@@ -271,7 +271,7 @@ export default Home = ({ navigation }) => {
       {
 
       }   
-    }, 3000)
+    }, 1000)
 
     return () => {
       clearInterval(intervalId);
